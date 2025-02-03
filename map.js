@@ -139,6 +139,7 @@ function focusRoute(route) {
     const layer = routeLayers.get(route.id);
     if (layer) {
         map.fitBounds(layer.getBounds());
+        layer.bindPopup(route.name).openPopup();
     }
 }
 
