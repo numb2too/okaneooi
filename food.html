@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<!-- 引入 CSS -->
+<link rel="stylesheet" href="css/index.css">
+<script src="js/foodJson.js?1"></script>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美食地圖</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .search-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+
+        .filter-section {
+            margin: 10px 0;
+        }
+
+        .filter-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .filter-button {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-button.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .video-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .video-card img {
+            width: 100%;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .video-card img:hover {
+            transform: scale(1.05);
+        }
+
+        .video-info {
+            margin-top: 10px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .tag {
+            background-color: #e0e0e0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="my-title">
+        <div>屋拎美食地圖</div>
+        <a href="index.html">首頁</a>
+        <a href="https://www.youtube.com/@wlintvvv">youtube</a>
+        <a href="https://www.instagram.com/food_okaneooi">IG</a>
+    </div>
+    <div class="search-container">
+        <input type="text" id="titleSearch" class="search-input" placeholder="搜尋標題">
+
+        <div class="filter-section">
+            <div class="filter-title">國家</div>
+            <div id="countryFilters" class="filter-buttons"></div>
+        </div>
+
+        <div class="filter-section">
+            <div class="filter-title">城市</div>
+            <div id="cityFilters" class="filter-buttons"></div>
+        </div>
+
+        <div class="filter-section">
+            <div class="filter-title">美食類型</div>
+            <div id="foodFilters" class="filter-buttons"></div>
+        </div>
+    </div>
+
+    <div id="videoContainer" class="videos-grid"></div>
+
+    <script>
+        // 儲存選中的過濾條件
+        const selectedFilters = {
+            countries: new Set(),
+            cities: new Set(),
+            foods: new Set()
+        };
+
+        // 獲取所有唯一值
+        function getUniqueValues() {
+            const countries = new Set();
+            const cities = new Set();
+            const foods = new Set();
+
+            foodJsonData.forEach(video => {
+                countries.add(video.country);
+                cities.add(video.city);
+                video.foods.forEach(food => foods.add(food));
+            });
+
+            return {
+                countries: Array.from(countries),
+                cities: Array.from(cities),
+                foods: Array.from(foods)
+            };
+        }
+
+        // 創建過濾按鈕
+        function createFilterButtons() {
+            const uniqueValues = getUniqueValues();
+
+            // 創建國家按鈕
+            const countryFilters = document.getElementById('countryFilters');
+            uniqueValues.countries.forEach(country => {
+                const button = createFilterButton(country, 'countries');
+                countryFilters.appendChild(button);
+            });
+
+            // 創建城市按鈕
+            const cityFilters = document.getElementById('cityFilters');
+            uniqueValues.cities.forEach(city => {
+                const button = createFilterButton(city, 'cities');
+                cityFilters.appendChild(button);
+            });
+
+            // 創建美食按鈕
+            const foodFilters = document.getElementById('foodFilters');
+            uniqueValues.foods.forEach(food => {
+                const button = createFilterButton(food, 'foods');
+                foodFilters.appendChild(button);
+            });
+        }
+
+        // 創建單個過濾按鈕
+        function createFilterButton(value, filterType) {
+            const button = document.createElement('button');
+            button.className = 'filter-button';
+            button.textContent = value;
+            button.addEventListener('click', () => {
+                button.classList.toggle('active');
+                if (button.classList.contains('active')) {
+                    selectedFilters[filterType].add(value);
+                } else {
+                    selectedFilters[filterType].delete(value);
+                }
+                filterVideos();
+            });
+            return button;
+        }
+
+        // 從 YouTube URL 取得影片 ID
+        function getYouTubeVideoId(url) {
+            try {
+                const urlObj = new URL(url);
+                if (urlObj.hostname === 'youtu.be') {
+                    return urlObj.pathname.slice(1);
+                }
+                const videoId = urlObj.searchParams.get('v');
+                return videoId || url.split('/').pop();
+            } catch {
+                const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+                const match = url.match(regExp);
+                return (match && match[7].length === 11) ? match[7] : null;
+            }
+        }
+
+        function displayVideos(videos) {
+            const container = document.getElementById('videoContainer');
+            container.innerHTML = '';
+
+            videos.forEach(video => {
+                const videoId = getYouTubeVideoId(video.youtubeLink);
+                const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+
+                const videoElement = document.createElement('div');
+                videoElement.className = 'video-card';
+                videoElement.innerHTML = `
+                    <img src="${thumbnailUrl}" alt="${video.title}" onclick="window.open('${video.youtubeLink}', '_blank')">
+                    <div class="video-info">
+                        <h3>${video.title}</h3>
+                        <p> <a href="${video.googleMap}"  target="_blank">${video.address}</a></p> 
+                        <div class="tags">
+                            ${video.foods.map(food => `<span class="tag">${food}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(videoElement);
+            });
+        }
+
+        function filterVideos() {
+            const title = document.getElementById('titleSearch').value.toLowerCase();
+
+            const filteredVideos = foodJsonData.filter(video => {
+                // 標題過濾
+                if (!video.title.toLowerCase().includes(title)) {
+                    return false;
+                }
+
+                // 國家過濾
+                if (selectedFilters.countries.size > 0 && !selectedFilters.countries.has(video.country)) {
+                    return false;
+                }
+
+                // 城市過濾
+                if (selectedFilters.cities.size > 0 && !selectedFilters.cities.has(video.city)) {
+                    return false;
+                }
+
+                // 美食過濾
+                if (selectedFilters.foods.size > 0 && !video.foods.some(food => selectedFilters.foods.has(food))) {
+                    return false;
+                }
+
+                return true;
+            });
+
+            displayVideos(filteredVideos);
+        }
+
+        // 添加標題搜尋事件監聽器
+        document.getElementById('titleSearch').addEventListener('input', filterVideos);
+
+        // 初始化
+        createFilterButtons();
+        displayVideos(foodJsonData);
+    </script>
+</body>
+
+</html>
