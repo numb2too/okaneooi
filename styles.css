@@ -1,0 +1,44 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #2c3e50;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+}
+
+.container {
+    display: flex;
+    height: calc(100vh - 100px);
+}
+
+.search-section {
+    width: 300px;
+    padding: 20px;
+    background-color: white;
+    overflow-y: auto;
+}
+
+.map-section {
+    flex-grow: 1;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+}
+
+.route-result {
+    cursor: pointer;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.route-result:hover {
+    background-color: #f0f0f0;
+}
