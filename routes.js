@@ -12,6 +12,13 @@ const routes = [
         url: 'https://numb2too.github.io/okaneooi/routes/route2.geojson',
         youtube: 'https://youtu.be/example2',
         attractions: ['河濱公園', '自行車道']
+    },
+    { 
+        id: 'route3', 
+        name: '苗栗後龍 牛師父牛肉麵', 
+        url: 'https://numb2too.github.io/okaneooi/routes/route3.geojson',
+        youtube: 'https://www.youtube.com/shorts/RZBahJYWGJQ',
+        attractions: ['牛肉麵']
     }
 ];
 
