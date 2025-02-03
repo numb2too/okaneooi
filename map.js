@@ -61,10 +61,27 @@ function displayRoutes(routesToShow = loadedRoutes) {
     routeLayers.forEach(layer => map.removeLayer(layer));
     routeLayers.clear();
 
+    // 如果只顯示了一條路線，添加重置按鈕
+    if (routesToShow.length === 1) {
+        const resetButton = document.createElement('button');
+        resetButton.className = 'reset-filter-btn';
+        resetButton.innerHTML = '顯示所有路線 <i class="fas fa-sync"></i>';
+        resetButton.onclick = () => {
+            // 重置篩選器
+            activeFilters.clear();
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            // 顯示所有路線
+            displayRoutes(loadedRoutes);
+        };
+        resultsContainer.appendChild(resetButton);
+    }
+
     routesToShow.forEach(route => {
         // 創建結果卡片
         const card = document.createElement('div');
         card.className = 'route-card';
+        card.setAttribute('data-route-id', route.id);
         
         // 使用 YouTube 視頻 ID 生成縮圖 URL
         const videoId = route.youtube.split('/').pop();
@@ -95,12 +112,28 @@ function displayRoutes(routesToShow = loadedRoutes) {
         routeLayers.set(route.id, layer);
         
         layer.on('click', () => {
+            // 顯示右側結果面板
+            const resultsPanel = document.querySelector('.results-panel');
+            const toggleResultsBtn = document.getElementById('toggleResults');
+            resultsPanel.classList.remove('hidden');
+            toggleResultsBtn.classList.add('panel-visible');
+            
+            // 只顯示被點擊的路線
+            displayRoutes([route]);
+            
+            // 聚焦到該路線
             focusRoute(route);
-            card.scrollIntoView({ behavior: 'smooth' });
+            
+            // 延遲一下再滾動到卡片位置，確保面板已經完全展開
+            setTimeout(() => {
+                const updatedCard = document.querySelector(`[data-route-id="${route.id}"]`);
+                if (updatedCard) {
+                    updatedCard.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 300);
         });
     });
 }
-
 // 聚焦路線
 function focusRoute(route) {
     const layer = routeLayers.get(route.id);
@@ -121,6 +154,35 @@ document.querySelector('.search-box').addEventListener('input', (e) => {
     displayRoutes(filteredRoutes);
 });
 
+// 初始化面板控制
+function initializePanelControls() {
+    const filterPanel = document.querySelector('.filter-panel');
+    const resultsPanel = document.querySelector('.results-panel');
+    const toggleFilterBtn = document.getElementById('toggleFilter');
+    const toggleResultsBtn = document.getElementById('toggleResults');
+
+    // 設置初始狀態
+    filterPanel.classList.add('hidden');
+    resultsPanel.classList.add('hidden');
+
+    toggleFilterBtn.addEventListener('click', () => {
+        filterPanel.classList.toggle('hidden');
+        toggleFilterBtn.classList.toggle('panel-visible');
+    });
+
+    toggleResultsBtn.addEventListener('click', () => {
+        resultsPanel.classList.toggle('hidden');
+        toggleResultsBtn.classList.toggle('panel-visible');
+    });
+}
+
+// 調整地圖大小
+function updateMapSize() {
+    if (map) {
+        map.invalidateSize();
+    }
+}
+
 // 初始化應用
 async function initializeApp() {
     initMap();
@@ -140,6 +202,15 @@ async function initializeApp() {
     } catch (error) {
         console.error('Error initializing app:', error);
     }
+    
+    // 初始化面板控制
+    initializePanelControls();
+    
+    // 監聽面板變化以更新地圖大小
+    const panels = document.querySelectorAll('.filter-panel, .results-panel');
+    panels.forEach(panel => {
+        panel.addEventListener('transitionend', updateMapSize);
+    });
 }
 
 // 啟動應用
