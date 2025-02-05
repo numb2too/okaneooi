@@ -1,6 +1,102 @@
 // 資料
 const routes = [
   {
+    id: '9',
+    type: 'scenery',
+    name: '大甲鎮瀾宮',
+    googleMapUrl: [
+      { title: 'googleMap', url: 'https://maps.app.goo.gl/yEwtAgut3dAA4tUY6' }
+    ],
+    geoJson: {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              120.6235944,
+              24.3451924,
+              0
+            ]
+          },
+          "properties": {
+            "name": "大甲鎮瀾宮",
+            "styleUrl": "#__managed_style_1C4432C612360AC36F7D",
+            "fill-opacity": 0.25098039215686274,
+            "fill": "#ffffff",
+            "stroke-opacity": 1,
+            "stroke": "#fbc02d",
+            "stroke-width": 2.28571,
+            "icon-offset": [
+              64,
+              128
+            ],
+            "icon-offset-units": [
+              "pixels",
+              "insetPixels"
+            ],
+            "icon": "https://earth.google.com/earth/document/icon?color=ffee58&id=2000&scale=4"
+          },
+          "id": "07D2547FD0360AC36F77"
+        }
+      ]
+    },
+    videos: [
+      'https://youtube.com/shorts/e9FyYfxZCWQ?si=I4wCGRB3dXLCwzQa'
+    ],
+    instagram: [],
+    attractions: ['437台中市大甲區順天路158號','景點']
+  },
+  {
+    id: '8',
+    type: 'food',
+    name: '端端小湯包',
+    remember:'粉漿蛋餅超讚!!',
+    googleMapUrl: [
+      { title: 'googleMap', url: 'https://maps.app.goo.gl/Ly91gbLkmkZkwRP18' }
+    ],
+    geoJson: {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              120.6036607,
+              24.0810375,
+              0
+            ]
+          },
+          "properties": {
+            "name": "端端小湯包",
+            "styleUrl": "#__managed_style_1E0CB7EE00360ABD1B66",
+            "fill-opacity": 0.25098039215686274,
+            "fill": "#ffffff",
+            "stroke-opacity": 1,
+            "stroke": "#fbc02d",
+            "stroke-width": 2.28571,
+            "icon-offset": [
+              64,
+              128
+            ],
+            "icon-offset-units": [
+              "pixels",
+              "insetPixels"
+            ],
+            "icon": "https://earth.google.com/earth/document/icon?color=ffee58&id=2000&scale=4"
+          },
+          "id": "01ABB038FC360ABD1B5C"
+        }
+      ]
+    },
+    videos: [
+    ],
+    instagram: ['https://www.instagram.com/p/C_piSiAPtXN'],
+    attractions: ['433台中市沙鹿區錦衣街143號','美食', '沙鹿', '清水', '西西里','可頌','咖啡','冰淇淋']
+  },
+  {
     id: '7',
     type: 'food',
     name: 'H.YEN',
