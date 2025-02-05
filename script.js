@@ -31,7 +31,7 @@ async function loadGeoJSON(route) {
                 let popupContent = `
                     <strong>${route.name}</strong>`;
 
-                if (route.type === 'route') {
+                if (route.kml && route.kml === true) {
                     popupContent += `<br>
                         <button onclick="handleKMLDownload('${route.id}', '${route.name}')" 
                                 style="margin-top: 10px; padding: 5px 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
