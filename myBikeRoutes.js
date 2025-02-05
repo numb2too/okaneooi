@@ -48,7 +48,7 @@ const routes = [
       
     ],
     instagram: ['https://www.instagram.com/p/C8rI0RgSaVA/'],
-    attractions: ['357苗栗縣通霄鎮12鄰67-3號','瑪德蓮','甜點','蛋糕']
+    attractions: ['357苗栗縣通霄鎮12鄰67-3號','瑪德蓮','甜點','蛋糕','白沙屯美食']
   },
   {
   id: '10',
@@ -97,7 +97,7 @@ const routes = [
     'https://youtu.be/Kic6cLlAbLw?si=IyMlHj4j70M9vyfY'
   ],
   instagram: ['https://www.instagram.com/p/DEuEfv6ynQa'],
-  attractions: ['357苗栗縣通霄鎮12鄰67-3號', '手搖杯','飲料']
+  attractions: ['357苗栗縣通霄鎮12鄰67-3號', '手搖杯','飲料','白沙屯美食']
 },
 {
   id: '9',
