@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旅遊地圖</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #sidebar {
+            width: 400px;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        #map {
+            flex: 1;
+            height: 100%;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #e9ecef;
+            cursor: pointer;
+        }
+
+        .filter-button.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .route-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .route-item {
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .route-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+
+        .tag {
+            padding: 2px 8px;
+            background: #e9ecef;
+            border-radius: 12px;
+            font-size: 0.9em;
+        }
+
+        .videos {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            #sidebar {
+                width: 100%;
+                height: 50%;
+            }
+
+            #map {
+                height: 50%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div id="sidebar">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="搜尋地點、標籤..." id="searchInput">
+                <div class="filter-buttons">
+                    <button class="filter-button active" data-type="all">全部</button>
+                    <button class="filter-button" data-type="route">路線</button>
+                    <button class="filter-button" data-type="scenery">風景</button>
+                    <button class="filter-button" data-type="food">美食</button>
+                </div>
+            </div>
+            <div class="route-list" id="routeList"></div>
+        </div>
+        <div id="map"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script src="myBikeRoutes.js"></script>
+    <script>
+       
+
+        // 初始化地圖
+        const map = L.map('map').setView([24.565, 120.815], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // 地圖圖層管理
+        const layerGroups = {};
+        const routeLayers = {};
+
+        // 修改 loadGeoJSON 函數
+        async function loadGeoJSON(route) {
+            try {
+                const data = route.geoJson;
+
+                let firstLayer = null; // 用來存儲第一個特徵的圖層引用
+
+                const layer = L.geoJSON(data, {
+                    style: {
+                        weight: 5,
+                        opacity: 0.7
+                    },
+                    onEachFeature: (feature, layer) => {
+                        // 存儲第一個特徵的圖層引用
+                        if (!firstLayer) {
+                            firstLayer = layer;
+                        }
+
+                        let popupContent = `
+                    <strong>${route.name}</strong><br>
+                    ${route.attractions.join(', ')}`;
+
+                        if (route.type === 'route') {
+                            popupContent += `<br>
+                        <button onclick="handleKMLDownload('${route.id}', '${route.name}')" 
+                                style="margin-top: 10px; padding: 5px 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            下載 KML
+                        </button>`;
+                        }
+
+                        layer.bindPopup(popupContent);
+                    }
+                });
+
+                // 儲存圖層引用和第一個特徵的圖層引用
+                routeLayers[route.id] = {
+                    layer: layer,
+                    firstLayer: firstLayer
+                };
+
+                if (!layerGroups[route.type]) {
+                    layerGroups[route.type] = L.layerGroup().addTo(map);
+                }
+                layer.addTo(layerGroups[route.type]);
+
+                const bounds = layer.getBounds();
+                map.fitBounds(bounds, { padding: [50, 50] });
+            } catch (error) {
+                console.error('Error loading GeoJSON:', error);
+            }
+        }
+
+        // 生成隨機顏色
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // 轉換 YouTube URL 為嵌入連結
+        function getYouTubeEmbedUrl(url) {
+            const videoId = url.split('v=')[1] || url.split('/').pop();
+            return `https://www.youtube.com/embed/${videoId}`;
+        }
+
+        // 渲染路線列表
+        function renderRouteList(filteredRoutes = routes) {
+            const routeList = document.getElementById('routeList');
+            routeList.innerHTML = '';
+
+            filteredRoutes.forEach(route => {
+                const routeElement = document.createElement('div');
+                routeElement.className = 'route-item';
+                routeElement.innerHTML = `
+                    <div class="route-name">${route.name}</div>
+                    <div class="tags">
+                        ${route.attractions.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                    <div class="videos">
+                        ${route.videos.map(video => `
+                            <div class="video-container">
+                                <iframe 
+                                    src="${getYouTubeEmbedUrl(video)}" 
+                                    frameborder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                    allowfullscreen>
+                                </iframe>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                // 點擊路線項目時聚焦到對應的地圖位置
+                routeElement.addEventListener('click', () => {
+                    const layerInfo = routeLayers[route.id];
+                    if (layerInfo && layerInfo.layer) {
+                        map.fitBounds(layerInfo.layer.getBounds());
+                        if (layerInfo.firstLayer) {
+                            layerInfo.firstLayer.openPopup();
+                        }
+                    }
+                });
+
+                routeList.appendChild(routeElement);
+            });
+        }
+
+        // 搜尋功能
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredRoutes = routes.filter(route => {
+                return route.name.toLowerCase().includes(searchTerm) ||
+                    route.attractions.some(tag => tag.toLowerCase().includes(searchTerm));
+            });
+            renderRouteList(filteredRoutes);
+        });
+
+        // 過濾按鈕功能
+        document.querySelectorAll('.filter-button').forEach(button => {
+            button.addEventListener('click', () => {
+                // 更新按鈕狀態
+                document.querySelectorAll('.filter-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                button.classList.add('active');
+
+                // 過濾路線
+                const type = button.dataset.type;
+                const filteredRoutes = type === 'all'
+                    ? routes
+                    : routes.filter(route => route.type === type);
+                renderRouteList(filteredRoutes);
+
+                // 更新地圖顯示
+                Object.entries(layerGroups).forEach(([groupType, group]) => {
+                    if (type === 'all' || type === groupType) {
+                        map.addLayer(group);
+                    } else {
+                        map.removeLayer(group);
+                    }
+                });
+            });
+        });
+
+        // 初始化
+        routes.forEach(loadGeoJSON);
+        renderRouteList();
+    </script>
+
+    <script>
+        // GeoJSON to KML 轉換函數
+        function convertToKML(geojson, routeName) {
+            // KML 文件開頭
+            let kml = `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+    <Document>
+        <name>${routeName}</name>
+        <Style id="lineStyle">
+            <LineStyle>
+                <color>ff0000ff</color>
+                <width>4</width>
+            </LineStyle>
+        </Style>`;
+
+            // 處理 GeoJSON 特徵
+            geojson.features.forEach((feature, index) => {
+                kml += `
+        <Placemark>
+            <name>Path ${index + 1}</name>
+            <styleUrl>#lineStyle</styleUrl>
+            <LineString>
+                <coordinates>`;
+
+                // 對於 LineString
+                if (feature.geometry.type === "LineString") {
+                    feature.geometry.coordinates.forEach(coord => {
+                        kml += `${coord[0]},${coord[1]},0 `;
+                    });
+                }
+                // 對於 MultiLineString
+                else if (feature.geometry.type === "MultiLineString") {
+                    feature.geometry.coordinates.forEach(line => {
+                        line.forEach(coord => {
+                            kml += `${coord[0]},${coord[1]},0 `;
+                        });
+                    });
+                }
+
+                kml += `</coordinates>
+            </LineString>
+        </Placemark>`;
+            });
+
+            // KML 文件結尾
+            kml += `
+    </Document>
+</kml>`;
+
+            return kml;
+        }
+
+        // 下載功能
+        function downloadKML(kmlContent, filename) {
+            const blob = new Blob([kmlContent], { type: 'application/vnd.google-earth.kml+xml' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // 處理下載事件的函數
+        window.handleKMLDownload = function (routeId, routeName) {
+            const layerInfo = routeLayers[routeId];
+            if (layerInfo && layerInfo.layer) {
+                const geojson = layerInfo.layer.toGeoJSON();
+                const kml = convertToKML(geojson, routeName);
+                downloadKML(kml, `${routeName}.kml`);
+            }
+        };
+    </script>
+</body>
+
+</html>

@@ -164,7 +164,7 @@ function initializePanelControls() {
 
     // 設置初始狀態
     filterPanel.classList.add('hidden');
-    resultsPanel.classList.add('hidden');
+    resultsPanel.classList.add('panel-visible');
 
     toggleFilterBtn.addEventListener('click', () => {
         filterPanel.classList.toggle('hidden');
