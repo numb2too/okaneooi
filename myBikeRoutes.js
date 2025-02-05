@@ -4,7 +4,9 @@
         id: 'route1',
         type: 'route',
         name: '都市綠廊路線11',
-        url: 'https://numb2too.github.io/okaneooi/routes/route1.geojson',
+        googleMapUrl: [{title:'起點', url:'https://maps.app.goo.gl/VGEoc7KuaRtLiYh1A'}
+            ,{title:'終點', url:'https://maps.app.goo.gl/VGEoc7KuaRtLiYh1A'}
+        ],
         geoJson:{
             "type": "FeatureCollection",
             "features": [
@@ -42,7 +44,7 @@
         id: 'route2',
         type: 'route',
         name: '河岸風光路線',
-        url: 'https://numb2too.github.io/okaneooi/routes/route2.geojson',
+        googleMapUrl: 'https://maps.app.goo.gl/VGEoc7KuaRtLiYh1A',
         videos: ['https://www.youtube.com/shorts/RZBahJYWGJQ'],
         geoJson: {
             "type": "FeatureCollection",
@@ -74,14 +76,19 @@
               }
             ]
           },
+          googleMapUrl: [{title:'起點', url:'https://maps.app.goo.gl/VGEoc7KuaRtLiYh1A'}
+              ,{title:'終點', url:'https://maps.app.goo.gl/VGEoc7KuaRtLiYh1A'}
+          ],
         attractions: ['河濱公園', '自行車道']
     },
     {
         id: 'route3',
         type: 'food',
         name: '苗栗後龍 牛師父牛肉麵',
-        url: 'https://numb2too.github.io/okaneooi/routes/route3.geojson',
+        googleMapUrl: 'https://maps.app.goo.gl/VGEoc7KuaRtLiYh1A',
         videos: ['https://www.youtube.com/shorts/RZBahJYWGJQ'],
+        googleMapUrl: [{title:'餐廳map', url:'https://maps.app.goo.gl/VGEoc7KuaRtLiYh1A'}
+        ],
         geoJson: {
             "type": "FeatureCollection",
             "features": [
