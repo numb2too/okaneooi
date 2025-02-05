@@ -1,11 +1,13 @@
 // 資料
 const routes = [
+  
   {
-    id: '9',
-    type: 'scenery',
-    name: '大甲鎮瀾宮',
+    id: '11',
+    type: 'food',
+    name: '初來甜點スイーツ',
+    remember:'我會為了瑪德蓮特地跑來吃。榛果可可瑪德蓮真的是好吃到一次吃三顆。來白沙屯甜點唯一首選',
     googleMapUrl: [
-      { title: 'googleMap', url: 'https://maps.app.goo.gl/yEwtAgut3dAA4tUY6' }
+      { title: 'googleMap', url: 'https://maps.app.goo.gl/SRSkoRBe6SJXa6xn9' }
     ],
     geoJson: {
       "type": "FeatureCollection",
@@ -15,14 +17,14 @@ const routes = [
           "geometry": {
             "type": "Point",
             "coordinates": [
-              120.6235944,
-              24.3451924,
+              120.7099826,
+              24.5703745,
               0
             ]
           },
           "properties": {
-            "name": "大甲鎮瀾宮",
-            "styleUrl": "#__managed_style_1C4432C612360AC36F7D",
+            "name": "初來甜點スイーツ",
+            "styleUrl": "#__managed_style_33BC58E910360B93FF84",
             "fill-opacity": 0.25098039215686274,
             "fill": "#ffffff",
             "stroke-opacity": 1,
@@ -38,208 +40,305 @@ const routes = [
             ],
             "icon": "https://earth.google.com/earth/document/icon?color=ffee58&id=2000&scale=4"
           },
-          "id": "07D2547FD0360AC36F77"
+          "id": "0E69CAB7F3360B93FF81"
         }
       ]
     },
     videos: [
-      'https://youtube.com/shorts/e9FyYfxZCWQ?si=I4wCGRB3dXLCwzQa'
+      
     ],
-    instagram: [],
-    attractions: ['437台中市大甲區順天路158號','景點']
+    instagram: ['https://www.instagram.com/p/C8rI0RgSaVA/'],
+    attractions: ['357苗栗縣通霄鎮12鄰67-3號','瑪德蓮','甜點','蛋糕']
   },
   {
-    id: '8',
-    type: 'food',
-    name: '端端小湯包',
-    remember:'粉漿蛋餅超讚!!',
-    googleMapUrl: [
-      { title: 'googleMap', url: 'https://maps.app.goo.gl/Ly91gbLkmkZkwRP18' }
-    ],
-    geoJson: {
-      "type": "FeatureCollection",
-      "features": [
-        {
-          "type": "Feature",
-          "geometry": {
-            "type": "Point",
-            "coordinates": [
-              120.6036607,
-              24.0810375,
-              0
-            ]
-          },
-          "properties": {
-            "name": "端端小湯包",
-            "styleUrl": "#__managed_style_1E0CB7EE00360ABD1B66",
-            "fill-opacity": 0.25098039215686274,
-            "fill": "#ffffff",
-            "stroke-opacity": 1,
-            "stroke": "#fbc02d",
-            "stroke-width": 2.28571,
-            "icon-offset": [
-              64,
-              128
-            ],
-            "icon-offset-units": [
-              "pixels",
-              "insetPixels"
-            ],
-            "icon": "https://earth.google.com/earth/document/icon?color=ffee58&id=2000&scale=4"
-          },
-          "id": "01ABB038FC360ABD1B5C"
-        }
-      ]
-    },
-    videos: [
-    ],
-    instagram: ['https://www.instagram.com/p/C_piSiAPtXN'],
-    attractions: ['433台中市沙鹿區錦衣街143號','美食', '沙鹿', '清水', '西西里','可頌','咖啡','冰淇淋']
+  id: '10',
+  type: 'food',
+  name: '白沙屯馥湘茶飲品-FuXiangTeaDrink',
+  remember:'來白沙屯喝的第一間手搖飲。第一次喝熱的冬瓜蕎麥，好喝。來白沙屯手搖杯唯一首選',
+  googleMapUrl: [
+    { title: 'googleMap', url: 'https://maps.app.goo.gl/5LA6MTS5peeytxXv6' }
+  ],
+  geoJson: {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            120.7100180358228,
+            24.57041073502096,
+            0
+          ]
+        },
+        "properties": {
+          "name": "白沙屯馥湘茶飲品-FuXiangTeaDrink",
+          "styleUrl": "#__managed_style_057862E4BC360B9391F2",
+          "fill-opacity": 0.25098039215686274,
+          "fill": "#ffffff",
+          "stroke-opacity": 1,
+          "stroke": "#fbc02d",
+          "stroke-width": 2.28571,
+          "icon-offset": [
+            64,
+            128
+          ],
+          "icon-offset-units": [
+            "pixels",
+            "insetPixels"
+          ],
+          "icon": "https://earth.google.com/earth/document/icon?color=ffee58&id=2000&scale=4"
+        },
+        "id": "0527AF8B4C360B9391EC"
+      }
+    ]
   },
-  {
-    id: '7',
-    type: 'food',
-    name: 'H.YEN',
-    remember:'讓我愛上西西里咖啡的店家，番茄可頌、咖哩可頌都很讚，其他可頌也不錯，冰淇淋可頌也不錯，但有點貴XD',
-    googleMapUrl: [
-      { title: 'googleMap', url: 'https://maps.app.goo.gl/HXSZTyoZUF3q8hz78' }
-    ],
-    geoJson: {
-      "type": "FeatureCollection",
-      "features": [
-        {
-          "type": "Feature",
-          "geometry": {
-            "type": "Point",
-            "coordinates": [
-              120.5646609,
-              24.2516369,
-              0
-            ]
-          },
-          "properties": {
-            "name": "H.YEN",
-            "styleUrl": "#__managed_style_06D3C7ED3C360AAB81FC",
-            "fill-opacity": 0.25098039215686274,
-            "fill": "#ffffff",
-            "stroke-opacity": 1,
-            "stroke": "#fbc02d",
-            "stroke-width": 2.28571,
-            "icon-scale": 1.5,
-            "icon-offset": [
-              64,
-              128
-            ],
-            "icon-offset-units": [
-              "pixels",
-              "insetPixels"
-            ],
-            "icon": "https://earth.google.com/earth/document/icon?color=ffee58&id=2000&scale=4"
-          },
-          "id": "0B32EEC874360AAB81ED"
-        }
-      ]
-    },
-    videos: ['https://youtube.com/shorts/U6xkOqJ8ZIs?si=cy-8buN4-4CjifXY'
-    ],
-    instagram: ['https://www.instagram.com/p/DCJJDb2yXsA/'],
-    attractions: ['433台中市沙鹿區錦衣街143號','美食', '沙鹿', '清水', '西西里','可頌','咖啡','冰淇淋']
+  videos: [
+    'https://youtu.be/Kic6cLlAbLw?si=IyMlHj4j70M9vyfY'
+  ],
+  instagram: ['https://www.instagram.com/p/DEuEfv6ynQa'],
+  attractions: ['357苗栗縣通霄鎮12鄰67-3號', '手搖杯','飲料']
+},
+{
+  id: '9',
+  type: 'scenery',
+  name: '大甲鎮瀾宮',
+  googleMapUrl: [
+    { title: 'googleMap', url: 'https://maps.app.goo.gl/yEwtAgut3dAA4tUY6' }
+  ],
+  geoJson: {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            120.6235944,
+            24.3451924,
+            0
+          ]
+        },
+        "properties": {
+          "name": "大甲鎮瀾宮",
+          "styleUrl": "#__managed_style_1C4432C612360AC36F7D",
+          "fill-opacity": 0.25098039215686274,
+          "fill": "#ffffff",
+          "stroke-opacity": 1,
+          "stroke": "#fbc02d",
+          "stroke-width": 2.28571,
+          "icon-offset": [
+            64,
+            128
+          ],
+          "icon-offset-units": [
+            "pixels",
+            "insetPixels"
+          ],
+          "icon": "https://earth.google.com/earth/document/icon?color=ffee58&id=2000&scale=4"
+        },
+        "id": "07D2547FD0360AC36F77"
+      }
+    ]
   },
-  {
-    id: '6',
-    type: 'food',
-    name: '小時厚牛排-台中梧棲店',
-    googleMapUrl: [
-      { title: 'googleMap', url: 'https://maps.app.goo.gl/USvZLLUGd2DwgbRRA' }
-    ],
-    geoJson: {
-      "type": "FeatureCollection",
-      "features": [
-        {
-          "type": "Feature",
-          "geometry": {
-            "type": "Point",
-            "coordinates": [
-              120.5312764,
-              24.2561405,
-              0
-            ]
-          },
-          "properties": {
-            "name": "小時厚牛排-台中梧棲店",
-            "styleUrl": "#__managed_style_01493F5621360AA50CED",
-            "fill-opacity": 0.25098039215686274,
-            "fill": "#ffffff",
-            "stroke-opacity": 1,
-            "stroke": "#fbc02d",
-            "stroke-width": 2.28571,
-            "icon-offset": [
-              64,
-              128
-            ],
-            "icon-offset-units": [
-              "pixels",
-              "insetPixels"
-            ],
-            "icon": "https://earth.google.com/earth/document/icon?id=2000&scale=4"
-          },
-          "id": "0DB3CBE302360AA50CE5"
-        }
-      ]
-    },
-    videos: ['https://youtube.com/shorts/hYv2vrPUK1M?si=GKybUQ-lU6J44lqj'
-    ],
-    instagram: ['https://www.instagram.com/p/DFeoqdyv2zE/'],
-    attractions: ['43547台中市梧棲區文化路二段188-1號','美食', '梧棲', '清水', '牛排']
+  videos: [
+    'https://youtube.com/shorts/e9FyYfxZCWQ?si=I4wCGRB3dXLCwzQa'
+  ],
+  instagram: [],
+  attractions: ['437台中市大甲區順天路158號', '景點']
+},
+{
+  id: '8',
+  type: 'food',
+  name: '端端小湯包',
+  remember: '粉漿蛋餅超讚!!',
+  googleMapUrl: [
+    { title: 'googleMap', url: 'https://maps.app.goo.gl/Ly91gbLkmkZkwRP18' }
+  ],
+  geoJson: {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            120.6036607,
+            24.0810375,
+            0
+          ]
+        },
+        "properties": {
+          "name": "端端小湯包",
+          "styleUrl": "#__managed_style_1E0CB7EE00360ABD1B66",
+          "fill-opacity": 0.25098039215686274,
+          "fill": "#ffffff",
+          "stroke-opacity": 1,
+          "stroke": "#fbc02d",
+          "stroke-width": 2.28571,
+          "icon-offset": [
+            64,
+            128
+          ],
+          "icon-offset-units": [
+            "pixels",
+            "insetPixels"
+          ],
+          "icon": "https://earth.google.com/earth/document/icon?color=ffee58&id=2000&scale=4"
+        },
+        "id": "01ABB038FC360ABD1B5C"
+      }
+    ]
   },
-  {
-    id: '5',
-    type: 'food',
-    name: 'beard papa泡芙',
-    googleMapUrl: [
-      { title: 'googleMap', url: 'https://maps.app.goo.gl/MY5bugTiLkysEWvA6' }
-    ],
-    geoJson: {
-      "type": "FeatureCollection",
-      "features": [
-        {
-          "type": "Feature",
-          "geometry": {
-            "type": "Point",
-            "coordinates": [
-              120.5182288131992,
-              24.25922581264995,
-              4.90341451426344
-            ]
-          },
-          "properties": {
-            "name": "beard papa's泡芙",
-            "styleUrl": "#__managed_style_0B8F6583DE360A90CF51",
-            "fill-opacity": 0.25098039215686274,
-            "fill": "#ffffff",
-            "stroke-opacity": 1,
-            "stroke": "#fbc02d",
-            "stroke-width": 2.28571,
-            "icon-offset": [
-              64,
-              128
-            ],
-            "icon-offset-units": [
-              "pixels",
-              "insetPixels"
-            ],
-            "icon": "https://earth.google.com/earth/document/icon?id=2000&scale=4"
-          },
-          "id": "03B9FE2875360A90CF4A"
-        }
-      ]
-    },
-    videos: ['https://youtube.com/shorts/vpZu7u0xmaM?si=jYe5nZ-CRSY9xNUM'
-    ],
-    instagram: ['https://www.instagram.com/p/DFT4ubYy7Dp'],
-    attractions: ['435台中市梧棲區臺灣大道十段168號2樓','美食', '清水', '三井', '泡芙','甜點']
+  videos: [
+  ],
+  instagram: ['https://www.instagram.com/p/C_piSiAPtXN'],
+  attractions: ['433台中市沙鹿區錦衣街143號', '美食', '沙鹿', '清水', '西西里', '可頌', '咖啡', '冰淇淋']
+},
+{
+  id: '7',
+  type: 'food',
+  name: 'H.YEN',
+  remember: '讓我愛上西西里咖啡的店家，番茄可頌、咖哩可頌都很讚，其他可頌也不錯，冰淇淋可頌也不錯，但有點貴XD',
+  googleMapUrl: [
+    { title: 'googleMap', url: 'https://maps.app.goo.gl/HXSZTyoZUF3q8hz78' }
+  ],
+  geoJson: {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            120.5646609,
+            24.2516369,
+            0
+          ]
+        },
+        "properties": {
+          "name": "H.YEN",
+          "styleUrl": "#__managed_style_06D3C7ED3C360AAB81FC",
+          "fill-opacity": 0.25098039215686274,
+          "fill": "#ffffff",
+          "stroke-opacity": 1,
+          "stroke": "#fbc02d",
+          "stroke-width": 2.28571,
+          "icon-scale": 1.5,
+          "icon-offset": [
+            64,
+            128
+          ],
+          "icon-offset-units": [
+            "pixels",
+            "insetPixels"
+          ],
+          "icon": "https://earth.google.com/earth/document/icon?color=ffee58&id=2000&scale=4"
+        },
+        "id": "0B32EEC874360AAB81ED"
+      }
+    ]
   },
-  {
+  videos: ['https://youtube.com/shorts/U6xkOqJ8ZIs?si=cy-8buN4-4CjifXY'
+  ],
+  instagram: ['https://www.instagram.com/p/DCJJDb2yXsA/'],
+  attractions: ['433台中市沙鹿區錦衣街143號', '美食', '沙鹿', '清水', '西西里', '可頌', '咖啡', '冰淇淋']
+},
+{
+  id: '6',
+  type: 'food',
+  name: '小時厚牛排-台中梧棲店',
+  googleMapUrl: [
+    { title: 'googleMap', url: 'https://maps.app.goo.gl/USvZLLUGd2DwgbRRA' }
+  ],
+  geoJson: {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            120.5312764,
+            24.2561405,
+            0
+          ]
+        },
+        "properties": {
+          "name": "小時厚牛排-台中梧棲店",
+          "styleUrl": "#__managed_style_01493F5621360AA50CED",
+          "fill-opacity": 0.25098039215686274,
+          "fill": "#ffffff",
+          "stroke-opacity": 1,
+          "stroke": "#fbc02d",
+          "stroke-width": 2.28571,
+          "icon-offset": [
+            64,
+            128
+          ],
+          "icon-offset-units": [
+            "pixels",
+            "insetPixels"
+          ],
+          "icon": "https://earth.google.com/earth/document/icon?id=2000&scale=4"
+        },
+        "id": "0DB3CBE302360AA50CE5"
+      }
+    ]
+  },
+  videos: ['https://youtube.com/shorts/hYv2vrPUK1M?si=GKybUQ-lU6J44lqj'
+  ],
+  instagram: ['https://www.instagram.com/p/DFeoqdyv2zE/'],
+  attractions: ['43547台中市梧棲區文化路二段188-1號', '美食', '梧棲', '清水', '牛排']
+},
+{
+  id: '5',
+  type: 'food',
+  name: 'beard papa泡芙',
+  googleMapUrl: [
+    { title: 'googleMap', url: 'https://maps.app.goo.gl/MY5bugTiLkysEWvA6' }
+  ],
+  geoJson: {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            120.5182288131992,
+            24.25922581264995,
+            4.90341451426344
+          ]
+        },
+        "properties": {
+          "name": "beard papa's泡芙",
+          "styleUrl": "#__managed_style_0B8F6583DE360A90CF51",
+          "fill-opacity": 0.25098039215686274,
+          "fill": "#ffffff",
+          "stroke-opacity": 1,
+          "stroke": "#fbc02d",
+          "stroke-width": 2.28571,
+          "icon-offset": [
+            64,
+            128
+          ],
+          "icon-offset-units": [
+            "pixels",
+            "insetPixels"
+          ],
+          "icon": "https://earth.google.com/earth/document/icon?id=2000&scale=4"
+        },
+        "id": "03B9FE2875360A90CF4A"
+      }
+    ]
+  },
+  videos: ['https://youtube.com/shorts/vpZu7u0xmaM?si=jYe5nZ-CRSY9xNUM'
+  ],
+  instagram: ['https://www.instagram.com/p/DFT4ubYy7Dp'],
+  attractions: ['435台中市梧棲區臺灣大道十段168號2樓', '美食', '清水', '三井', '泡芙', '甜點']
+},
+{
   id: '4',
   type: 'scenery',
   name: '清水看火車',
@@ -332,13 +431,13 @@ const routes = [
   videos: ['https://youtube.com/shorts/lGb-awMC6I4?si=lHDxgMCMh34gjNm8'
   ],
   instagram: ['https://www.instagram.com/p/DFpZI61Sko1/'],
-  attractions: ['437台中市大甲區蔣公路181-2號','美食', '大甲', '蔣公路', '肉羹湯']
+  attractions: ['437台中市大甲區蔣公路181-2號', '美食', '大甲', '蔣公路', '肉羹湯']
 },
 {
   id: '2',
   type: 'scenery',
   name: '大甲蔣公路夜市',
-  kml:true,
+  kml: true,
   googleMapUrl: [
     { title: 'googleMap', url: 'https://maps.app.goo.gl/UyECt7amijDntZfz6' }
   ],
@@ -420,12 +519,12 @@ const routes = [
   videos: ['https://youtu.be/wZYowXPG-OA?si=sqC5BkXINIzg_GvR'
   ],
   instagram: [],
-  attractions: ['散步','風景', '大甲', '蔣公路夜市', '大甲鎮瀾宮']
+  attractions: ['散步', '風景', '大甲', '蔣公路夜市', '大甲鎮瀾宮']
 },
 {
   id: '1',
   type: 'route',
-  kml:true,
+  kml: true,
   name: '自行車路線1-溫寮景觀橋-海角明珠',
   googleMapUrl: [
     { title: '溫寮景觀橋', url: 'https://maps.app.goo.gl/bCny27hFTjZooo5m8' }
@@ -1601,6 +1700,6 @@ const routes = [
     , 'https://youtube.com/shorts/1jr7IAWloD8?si=y65rd5_g0VxdrOFg'
   ],
   instagram: [],
-  attractions: ['自行車','大甲', '高美濕地', '大安沙丘', '濱海自行車道大安段', '61西部濱海公路', '龜殼生態公園', '溫寮漁港']
+  attractions: ['自行車', '大甲', '高美濕地', '大安沙丘', '濱海自行車道大安段', '61西部濱海公路', '龜殼生態公園', '溫寮漁港']
 }
 ];
