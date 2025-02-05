@@ -29,8 +29,7 @@ async function loadGeoJSON(route) {
                 }
 
                 let popupContent = `
-                    <strong>${route.name}</strong><br>
-                    ${route.attractions.join(', ')}`;
+                    <strong>${route.name}</strong>`;
 
                 if (route.type === 'route') {
                     popupContent += `<br>
@@ -359,7 +358,7 @@ window.handleKMLDownload = function (routeId, routeName) {
 // 創建自定義位置控制按鈕
 L.Control.LocationButton = L.Control.extend({
     options: {
-        position: 'bottomright'
+        position: 'topright'
     },
 
     onAdd: function(map) {
@@ -438,3 +437,23 @@ L.Control.LocationButton = L.Control.extend({
 
 // 添加定位按鈕到地圖
 new L.Control.LocationButton().addTo(map);
+
+
+// Modal 功能
+const title = document.getElementById('title');
+const modal = document.getElementById('titleModal');
+const closeModal = document.querySelector('.close-modal');
+
+title.addEventListener('click', () => {
+    modal.style.display = 'block';
+});
+
+closeModal.addEventListener('click', () => {
+    modal.style.display = 'none';
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+        modal.style.display = 'none';
+    }
+});

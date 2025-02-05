@@ -12,19 +12,45 @@
 
 <body>
     <div class="container">
-        <div id="sidebar">
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="搜尋地點、標籤..." id="searchInput">
-                <div class="filter-buttons">
-                    <button class="filter-button active" data-type="all">全部</button>
-                    <button class="filter-button" data-type="route">路線</button>
-                    <button class="filter-button" data-type="scenery">風景</button>
-                    <button class="filter-button" data-type="food">美食</button>
-                </div>
-            </div>
-            <div class="route-list" id="routeList"></div>
+        <div class="header" id="title">
+            屋拎人生到此一遊地圖
         </div>
-        <div id="map"></div>
+        <div class="content-wrapper">
+            <div id="sidebar">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="搜尋地點、標籤..." id="searchInput">
+                    <div class="filter-buttons">
+                        <button class="filter-button active" data-type="all">全部</button>
+                        <button class="filter-button" data-type="route">路線</button>
+                        <button class="filter-button" data-type="scenery">風景</button>
+                        <button class="filter-button" data-type="food">美食</button>
+                    </div>
+                </div>
+                <div class="route-list" id="routeList"></div>
+            </div>
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="titleModal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <h2 class="modal-title">歡迎來到屋拎人生！</h2>
+            <p class="modal-description">跟著我們一起探索精彩宇宙吧~</p>
+            <div class="social-links">
+                <a href="https://www.instagram.com/food_okaneooi/" target="_blank" class="social-link instagram">
+                    <span>Instagram</span>
+                </a>
+                <a href="https://www.youtube.com/@wlintvvv" target="_blank" class="social-link youtube">
+                    <span>YouTube</span>
+                </a>
+                <a href="https://earth.google.com/earth/d/13YQZGQ_4m_231FCcwAN1bQjUKicYlEzc?usp=sharing" target="_blank" class="social-link youtube">
+                    <span>google earth</span>
+                </a>
+                
+            </div>
+        </div>
     </div>
  
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
