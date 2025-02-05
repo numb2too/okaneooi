@@ -353,3 +353,88 @@ window.handleKMLDownload = function (routeId, routeName) {
         downloadKML(kml, `${routeName}.kml`);
     }
 };
+
+
+
+// 創建自定義位置控制按鈕
+L.Control.LocationButton = L.Control.extend({
+    options: {
+        position: 'bottomright'
+    },
+
+    onAdd: function(map) {
+        this._map = map;
+        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+        const button = L.DomUtil.create('a', 'location-button', container);
+        
+        button.innerHTML = '📍';
+        button.href = '#';
+        button.title = '定位當前位置';
+        button.style.cssText = `
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            font-size: 18px;
+            background-color: white;
+            display: block;
+            border-radius: 4px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+            cursor: pointer;
+            text-decoration: none;
+        `;
+
+        L.DomEvent.on(button, 'click', this._getCurrentLocation, this);
+        L.DomEvent.disableClickPropagation(container);
+
+        this._button = button;
+        return container;
+    },
+
+    _getCurrentLocation: function(e) {
+        e.preventDefault();
+        const button = this._button;
+        button.innerHTML = '⌛';
+        button.style.backgroundColor = '#f0f0f0';
+
+        // 初始化或更新標記
+        if (!this._locationMarker) {
+            this._locationMarker = L.marker([0, 0], {
+                icon: L.divIcon({
+                    className: 'current-location-marker',
+                    html: '📍',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 24]
+                })
+            }).addTo(this._map);
+        }
+
+        // 使用簡單的 getCurrentPosition
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                this._locationMarker.setLatLng([lat, lng]);
+                this._map.setView([lat, lng], 16);
+                
+                button.innerHTML = '📍';
+                button.style.backgroundColor = 'white';
+            },
+            (error) => {
+                console.error('Location error:', error);
+                alert('無法取得位置資訊，請確認GPS已開啟且已允許位置權限。');
+                button.innerHTML = '📍';
+                button.style.backgroundColor = 'white';
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            }
+        );
+    }
+});
+
+// 添加定位按鈕到地圖
+new L.Control.LocationButton().addTo(map);

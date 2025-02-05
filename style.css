@@ -130,6 +130,19 @@ body {
     transition: all 0.3s ease;
 }
 
+.location-button {
+    transition: background-color 0.2s ease;
+}
+
+.location-button:hover {
+    background-color: #f4f4f4 !important;
+}
+
+/* 為了確保 emoji 在各平台上的一致性 */
+.location-button {
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
 @media (max-width: 768px) {
     .container {
         flex-direction: column;
