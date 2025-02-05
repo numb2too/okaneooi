@@ -165,6 +165,10 @@ function renderRouteList(filteredRoutes = routes) {
         const routeElement = document.createElement('div');
         routeElement.className = 'route-item';
 
+        if(route.remember && route.remember.length > 0){
+            routeElement.setAttribute("style","background-color:#ded53f;");
+        }
+
         // 創建 YouTube 按鈕
         const videoButtons = route.videos.map((video, index) => `
 <button 
@@ -191,7 +195,6 @@ function renderRouteList(filteredRoutes = routes) {
 </button>
         `).join('') : '';
 
-        // 創建影片容器
         // 創建影片容器
         const videoContainers = route.videos.map((video, index) => `
 <div id="video-${routeIndex}-${index}" 
