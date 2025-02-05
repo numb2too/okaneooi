@@ -151,7 +151,7 @@ const routes = [
   id: '8',
   type: 'food',
   name: '端端小湯包',
-  remember: '粉漿蛋餅超讚!!',
+  remember: '粉漿蛋餅超讚!!我的必點清單是鮪魚粉漿蛋餅加起司，乾麵小辣，還有那超好喝的綜合湯！肉排也相當不錯，讓人一試成主顧！',
   googleMapUrl: [
     { title: 'googleMap', url: 'https://maps.app.goo.gl/Ly91gbLkmkZkwRP18' }
   ],
