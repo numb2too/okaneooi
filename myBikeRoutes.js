@@ -1,7 +1,7 @@
 // 資料
 const routes = [
   {
-    id: 'route3',
+    id: 'food1',
     type: 'food',
     name: '柯江發古早味肉羹',
     googleMapUrl: [
@@ -44,13 +44,13 @@ const routes = [
     },
     videos: ['https://youtube.com/shorts/lGb-awMC6I4?si=lHDxgMCMh34gjNm8'
     ],
-    instagram: [],
+    instagram: ['https://www.instagram.com/p/DFpZI61Sko1/'],
     attractions: ['美食', '大甲', '蔣公路','肉羹湯']
   },
   {
-    id: 'route2',
-    type: 'route',
-    name: '散步路線1',
+    id: 'scenery1',
+    type: 'scenery',
+    name: '大甲蔣公路夜市',
     googleMapUrl: [
       { title: '大甲蔣公路夜市', url: 'https://maps.app.goo.gl/UyECt7amijDntZfz6' }
     ],
@@ -1307,7 +1307,9 @@ const routes = [
         }
       ]
     },
-    videos: ['https://youtu.be/qhU_8Yf7PbM?si=m5AOHzrlNJy3F-5n'
+    videos: [
+      'https://youtu.be/qhU_8Yf7PbM?si=m5AOHzrlNJy3F-5n'
+     ,'https://youtube.com/shorts/1jr7IAWloD8?si=y65rd5_g0VxdrOFg'
     ],
     instagram: [],
     attractions: ['自行車', '高美濕地', '大安沙丘','濱海自行車道大安段','61西部濱海公路','龜殼生態公園','溫寮漁港']

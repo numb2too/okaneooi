@@ -254,7 +254,9 @@ body {
     color: #333;
 }
 
-
+.leaflet-top.leaflet-left {
+    display: none;
+}
 
 @media (max-width: 768px) {
     .content-wrapper {

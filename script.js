@@ -57,7 +57,51 @@ async function loadGeoJSON(route) {
                     popupContent += '</div>';
                 }
 
+                // 添加 Google Maps 連結（如果存在）
+                if (route.videos && route.videos.length > 0) {
+                    popupContent += '<div>';
+                    route.videos.forEach(link => {
+                        popupContent += `
+                    <a href="${link}" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       style="display: inline-block; margin: 2px 5px; padding: 3px 8px; 
+                              background-color:rgb(131, 75, 42); color: white; 
+                              text-decoration: none; border-radius: 4px; 
+                              font-size: 12px;">
+                        youtube <span style="font-size: 10px;">↗</span>
+                    </a>`;
+                    });
+                    popupContent += '</div>';
+                }
+
+                // 添加 Google Maps 連結（如果存在）
+                if (route.instagram && route.instagram.length > 0) {
+                    popupContent += '<div>';
+                    route.instagram.forEach(link => {
+                        popupContent += `
+                    <a href="${link}" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       style="display: inline-block; margin: 2px 5px; padding: 3px 8px; 
+                              background-color:rgb(169, 129, 237); color: white; 
+                              text-decoration: none; border-radius: 4px; 
+                              font-size: 12px;">
+                        IG <span style="font-size: 10px;">↗</span>
+                    </a>`;
+                    });
+                    popupContent += '</div>';
+                }
+
                 layer.bindPopup(popupContent);
+
+                // 添加點擊事件處理
+                layer.on('click', () => {
+                    const searchInput = document.getElementById('searchInput');
+                    searchInput.value = route.name;
+                    // 觸發 input 事件以執行搜尋
+                    searchInput.dispatchEvent(new Event('input'));
+                });
             }
         });
 
@@ -131,8 +175,8 @@ function renderRouteList(filteredRoutes = routes) {
         `).join('') : '';
 
         // 創建影片容器
-     // 創建影片容器
-const videoContainers = route.videos.map((video, index) => `
+        // 創建影片容器
+        const videoContainers = route.videos.map((video, index) => `
 <div id="video-${routeIndex}-${index}" 
      class="video-container"
      style="display: none; margin-top: 10px;">
@@ -375,11 +419,11 @@ L.Control.LocationButton = L.Control.extend({
         position: 'topright'
     },
 
-    onAdd: function(map) {
+    onAdd: function (map) {
         this._map = map;
         const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
         const button = L.DomUtil.create('a', 'location-button', container);
-        
+
         button.innerHTML = '📍';
         button.href = '#';
         button.title = '定位當前位置';
@@ -404,7 +448,7 @@ L.Control.LocationButton = L.Control.extend({
         return container;
     },
 
-    _getCurrentLocation: function(e) {
+    _getCurrentLocation: function (e) {
         e.preventDefault();
         const button = this._button;
         button.innerHTML = '⌛';
@@ -430,7 +474,7 @@ L.Control.LocationButton = L.Control.extend({
 
                 this._locationMarker.setLatLng([lat, lng]);
                 this._map.setView([lat, lng], 16);
-                
+
                 button.innerHTML = '📍';
                 button.style.backgroundColor = 'white';
             },
