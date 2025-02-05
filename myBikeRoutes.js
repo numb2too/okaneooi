@@ -47,7 +47,9 @@ const routes = [
       , 'https://youtu.be/qhU_8Yf7PbM?si=ZXO_ZvRPJWcNUyG0'
       , 'https://youtu.be/qhU_8Yf7PbM?si=ZXO_ZvRPJWcNUyG0'
     ],
-    instagram: ['https://www.instagram.com/p/DFpZI61Sko1/'],
+    instagram: ['https://www.instagram.com/p/DFpZI61Sko1/'
+      ,'https://www.instagram.com/p/DFpSxRVPk0G/'
+    ],
     attractions: ['都市公園1', '綠色走廊']
   },
   {
@@ -110,6 +112,33 @@ const routes = [
           "geometry": {
             "coordinates": [
               120.57011885138007,
+              24.353404531231845
+            ],
+            "type": "Point"
+          }
+        }
+      ]
+    },
+    attractions: ['牛肉麵']
+  },
+  {
+    id: 'route4',
+    type: 'scenery',
+    name: 'AAAAA',
+    googleMapUrl: 'https://maps.app.goo.gl/VGEoc7KuaRtLiYh1A',
+    videos: ['https://www.youtube.com/shorts/RZBahJYWGJQ'],
+    googleMapUrl: [{ title: '餐廳map', url: 'https://maps.app.goo.gl/VGEoc7KuaRtLiYh1A' }
+    ],
+    instagram: ['https://www.instagram.com/p/DFpZI61Sko1/'],
+    geoJson: {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "properties": {},
+          "geometry": {
+            "coordinates": [
+              120.77011885138007,
               24.353404531231845
             ],
             "type": "Point"
