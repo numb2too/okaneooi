@@ -1,6 +1,53 @@
 // 資料
 const routes = [
   {
+    id: 'route3',
+    type: 'food',
+    name: '柯江發古早味肉羹',
+    googleMapUrl: [
+      { title: '柯江發古早味肉羹', url: 'https://maps.app.goo.gl/xBLguLcyAcqZaNQF7' }
+    ],
+    geoJson: {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              120.6207918,
+              24.3466819,
+              0
+            ]
+          },
+          "properties": {
+            "name": "柯江發古早味肉羹（85年老店）",
+            "styleUrl": "#__managed_style_0BF44D6823360A4C545E",
+            "fill-opacity": 0.25098039215686274,
+            "fill": "#ffffff",
+            "stroke-opacity": 1,
+            "stroke": "#fbc02d",
+            "stroke-width": 2.28571,
+            "icon-offset": [
+              64,
+              128
+            ],
+            "icon-offset-units": [
+              "pixels",
+              "insetPixels"
+            ],
+            "icon": "https://earth.google.com/earth/document/icon?color=fbc02d&id=2000&scale=4"
+          },
+          "id": "071A31C831360A4C5453"
+        }
+      ]
+    },
+    videos: ['https://youtube.com/shorts/lGb-awMC6I4?si=lHDxgMCMh34gjNm8'
+    ],
+    instagram: [],
+    attractions: ['美食', '大甲', '蔣公路','肉羹湯']
+  },
+  {
     id: 'route2',
     type: 'route',
     name: '散步路線1',

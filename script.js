@@ -131,19 +131,33 @@ function renderRouteList(filteredRoutes = routes) {
         `).join('') : '';
 
         // 創建影片容器
-        const videoContainers = route.videos.map((video, index) => `
-            <div id="video-${routeIndex}-${index}" 
-                 class="video-container"
-                 style="display: none; margin-top: 10px;">
-                <iframe 
-                    src="${getYouTubeEmbedUrl(video)}" 
-                    frameborder="0" 
-                    style="width: 100%; aspect-ratio: 16/9;"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-                </iframe>
-            </div>
-        `).join('');
+     // 創建影片容器
+const videoContainers = route.videos.map((video, index) => `
+<div id="video-${routeIndex}-${index}" 
+     class="video-container"
+     style="display: none; margin-top: 10px;">
+    <div class="video-wrapper">
+        <iframe 
+            src="${getYouTubeEmbedUrl(video)}" 
+            frameborder="0" 
+            style="width: 100%; aspect-ratio: 16/9;"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+        </iframe>
+        <div class="video-fallback" style="margin-top: 8px; text-align: center;">
+            <a href="${video}" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               style="display: inline-block; padding: 4px 12px; 
+                      background-color: #FF0000; color: white; 
+                      text-decoration: none; border-radius: 4px; 
+                      font-size: 12px;">
+                在 YouTube 觀看 <span style="font-size: 10px;">↗</span>
+            </a>
+        </div>
+    </div>
+</div>
+`).join('');
 
         // 創建 Instagram 容器
         const instagramContainers = route.instagram ? route.instagram.map((igUrl, index) => `
