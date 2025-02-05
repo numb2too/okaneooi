@@ -1,6 +1,102 @@
 // 資料
 const routes = [
   {
+    id: '7',
+    type: 'food',
+    name: 'H.YEN',
+    remember:'讓我愛上西西里咖啡的店家，番茄可頌、咖哩可頌都很讚，其他可頌也不錯，冰淇淋可頌也不錯，但有點貴XD',
+    googleMapUrl: [
+      { title: 'googleMap', url: 'https://maps.app.goo.gl/HXSZTyoZUF3q8hz78' }
+    ],
+    geoJson: {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              120.5646609,
+              24.2516369,
+              0
+            ]
+          },
+          "properties": {
+            "name": "H.YEN",
+            "styleUrl": "#__managed_style_06D3C7ED3C360AAB81FC",
+            "fill-opacity": 0.25098039215686274,
+            "fill": "#ffffff",
+            "stroke-opacity": 1,
+            "stroke": "#fbc02d",
+            "stroke-width": 2.28571,
+            "icon-scale": 1.5,
+            "icon-offset": [
+              64,
+              128
+            ],
+            "icon-offset-units": [
+              "pixels",
+              "insetPixels"
+            ],
+            "icon": "https://earth.google.com/earth/document/icon?color=ffee58&id=2000&scale=4"
+          },
+          "id": "0B32EEC874360AAB81ED"
+        }
+      ]
+    },
+    videos: ['https://youtube.com/shorts/U6xkOqJ8ZIs?si=cy-8buN4-4CjifXY'
+    ],
+    instagram: ['https://www.instagram.com/p/DCJJDb2yXsA/'],
+    attractions: ['433台中市沙鹿區錦衣街143號','美食', '沙鹿', '清水', '西西里','可頌','咖啡','冰淇淋']
+  },
+  {
+    id: '6',
+    type: 'food',
+    name: '小時厚牛排-台中梧棲店',
+    googleMapUrl: [
+      { title: 'googleMap', url: 'https://maps.app.goo.gl/USvZLLUGd2DwgbRRA' }
+    ],
+    geoJson: {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              120.5312764,
+              24.2561405,
+              0
+            ]
+          },
+          "properties": {
+            "name": "小時厚牛排-台中梧棲店",
+            "styleUrl": "#__managed_style_01493F5621360AA50CED",
+            "fill-opacity": 0.25098039215686274,
+            "fill": "#ffffff",
+            "stroke-opacity": 1,
+            "stroke": "#fbc02d",
+            "stroke-width": 2.28571,
+            "icon-offset": [
+              64,
+              128
+            ],
+            "icon-offset-units": [
+              "pixels",
+              "insetPixels"
+            ],
+            "icon": "https://earth.google.com/earth/document/icon?id=2000&scale=4"
+          },
+          "id": "0DB3CBE302360AA50CE5"
+        }
+      ]
+    },
+    videos: ['https://youtube.com/shorts/hYv2vrPUK1M?si=GKybUQ-lU6J44lqj'
+    ],
+    instagram: ['https://www.instagram.com/p/DFeoqdyv2zE/'],
+    attractions: ['43547台中市梧棲區文化路二段188-1號','美食', '梧棲', '清水', '牛排']
+  },
+  {
     id: '5',
     type: 'food',
     name: 'beard papa泡芙',

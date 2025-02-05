@@ -22,6 +22,21 @@ async function loadGeoJSON(route) {
                 weight: 5,
                 opacity: 0.7
             },
+            pointToLayer: (feature, latlng) => {
+                // 創建水滴形狀的 icon
+                const icon = L.divIcon({
+                    html: `<svg viewBox="0 0 24 24" width="32" height="32" fill="${route.remember ? '#FFD700' : '#1976d2'}" 
+                                 style="filter: ${route.remember ? 'drop-shadow(0 0 2px #B8860B)' : 'none'}">
+                              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                          </svg>`,
+                    className: 'custom-marker',
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 32],
+                    popupAnchor: [0, -32]
+                });
+                
+                return L.marker(latlng, { icon: icon });
+            },
             onEachFeature: (feature, layer) => {
                 // 存儲第一個特徵的圖層引用
                 if (!firstLayer) {
@@ -57,7 +72,6 @@ async function loadGeoJSON(route) {
                     popupContent += '</div>';
                 }
 
-                // 添加 Google Maps 連結（如果存在）
                 if (route.videos && route.videos.length > 0) {
                     popupContent += '<div>';
                     route.videos.forEach(link => {
@@ -75,7 +89,6 @@ async function loadGeoJSON(route) {
                     popupContent += '</div>';
                 }
 
-                // 添加 Google Maps 連結（如果存在）
                 if (route.instagram && route.instagram.length > 0) {
                     popupContent += '<div>';
                     route.instagram.forEach(link => {
@@ -91,6 +104,10 @@ async function loadGeoJSON(route) {
                     </a>`;
                     });
                     popupContent += '</div>';
+                }
+
+                if (route.remember && route.remember.length > 0) {
+                    popupContent += `<div>${route.remember}</div>`;
                 }
 
                 layer.bindPopup(popupContent);
