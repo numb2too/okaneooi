@@ -121,6 +121,19 @@
             height: 100%;
         }
 
+        .video-button {
+            transition: background-color 0.2s ease;
+        }
+
+        .video-button:hover {
+            background-color: #45a049 !important;
+             transform: scale(1.1);
+        }
+
+        .video-container {
+            transition: all 0.3s ease;
+        }
+
         @media (max-width: 768px) {
             .container {
                 flex-direction: column;
@@ -262,35 +275,61 @@
             const routeList = document.getElementById('routeList');
             routeList.innerHTML = '';
 
-            filteredRoutes.forEach(route => {
+            filteredRoutes.forEach((route, routeIndex) => {
                 const routeElement = document.createElement('div');
                 routeElement.className = 'route-item';
+
+                // 創建影片按鈕區塊，使用與 Google Maps 連結相同的樣式
+                const videoButtons = route.videos.map((video, index) => `
+            <button 
+                onclick="toggleVideo(event, ${routeIndex}, ${index})"
+                class="video-button"
+                style="display: inline-block; margin: 2px 5px; padding: 3px 8px; 
+                       background-color: #4CAF50; color: white; 
+                       border: none; text-decoration: none; border-radius: 4px; 
+                       font-size: 12px; cursor: pointer;">
+                YT ${index + 1} <span style="font-size: 20px;">▾</span>
+            </button>
+        `).join('');
+
+                // 創建影片容器（初始隱藏）
+                const videoContainers = route.videos.map((video, index) => `
+            <div id="video-${routeIndex}-${index}" 
+                 class="video-container"
+                 style="display: none; margin-top: 10px;">
+                <iframe 
+                    src="${getYouTubeEmbedUrl(video)}" 
+                    frameborder="0" 
+                    style="width: 100%; aspect-ratio: 16/9;"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        `).join('');
+
                 routeElement.innerHTML = `
-                    <div class="route-name">${route.name}</div>
-                    <div class="tags">
-                        ${route.attractions.map(tag => `<span class="tag">${tag}</span>`).join('')}
-                    </div>
-                    <div class="videos">
-                        ${route.videos.map(video => `
-                            <div class="video-container">
-                                <iframe 
-                                    src="${getYouTubeEmbedUrl(video)}" 
-                                    frameborder="0" 
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                    allowfullscreen>
-                                </iframe>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
+            <div class="route-name">${route.name}</div>
+            <div class="tags">
+                ${route.attractions.map(tag => `<span class="tag">${tag}</span>`).join('')}
+            </div>
+            <div class="video-buttons" style="margin-top: 10px;">
+                ${videoButtons}
+            </div>
+            <div class="videos">
+                ${videoContainers}
+            </div>
+        `;
 
                 // 點擊路線項目時聚焦到對應的地圖位置
-                routeElement.addEventListener('click', () => {
-                    const layerInfo = routeLayers[route.id];
-                    if (layerInfo && layerInfo.layer) {
-                        map.fitBounds(layerInfo.layer.getBounds());
-                        if (layerInfo.firstLayer) {
-                            layerInfo.firstLayer.openPopup();
+                routeElement.addEventListener('click', (e) => {
+                    // 檢查是否點擊到影片按鈕，如果是則不觸發地圖聚焦
+                    if (!e.target.classList.contains('video-button') && !e.target.parentElement.classList.contains('video-button')) {
+                        const layerInfo = routeLayers[route.id];
+                        if (layerInfo && layerInfo.layer) {
+                            map.fitBounds(layerInfo.layer.getBounds());
+                            if (layerInfo.firstLayer) {
+                                layerInfo.firstLayer.openPopup();
+                            }
                         }
                     }
                 });
@@ -298,6 +337,38 @@
                 routeList.appendChild(routeElement);
             });
         }
+
+        // 切換影片顯示/隱藏的函數
+        window.toggleVideo = function (event, routeIndex, videoIndex) {
+            event.stopPropagation(); // 防止觸發路線的點擊事件
+
+            // 獲取目標影片容器和按鈕
+            const targetVideo = document.getElementById(`video-${routeIndex}-${videoIndex}`);
+            const targetButton = event.target.closest('.video-button');
+            const allVideos = document.querySelectorAll('.video-container');
+            const allButtons = document.querySelectorAll('.video-button');
+
+            // 如果目標影片已經顯示，則隱藏它
+            if (targetVideo.style.display === 'block') {
+                targetVideo.style.display = 'none';
+                targetButton.style.backgroundColor = '#4CAF50';
+                targetButton.querySelector('span').textContent = '▾';
+            } else {
+                // 隱藏所有影片並重置按鈕樣式
+                allVideos.forEach(video => {
+                    video.style.display = 'none';
+                });
+                allButtons.forEach(btn => {
+                    btn.style.backgroundColor = '#4CAF50';
+                    btn.querySelector('span').textContent = '▾';
+                });
+
+                // 顯示目標影片並更新按鈕樣式
+                targetVideo.style.display = 'block';
+                targetButton.style.backgroundColor = '#45a049';  // 稍微深一點的綠色
+                targetButton.querySelector('span').textContent = '▴';
+            }
+        };
 
         // 搜尋功能
         document.getElementById('searchInput').addEventListener('input', (e) => {
@@ -399,7 +470,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = "屋拎_"+filename;
+            a.download = "屋拎_" + filename;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
