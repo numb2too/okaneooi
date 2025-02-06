@@ -216,8 +216,74 @@
             transform: translateY(-2px);
         }
 
+        /* 卡片等級樣式 */
+        .card {
+            position: relative;
+            overflow: hidden;
+        }
+
         .card[data-level="5"] {
             border-left: 4px solid #fbc02d;
+            background: linear-gradient(to right, rgba(251, 192, 45, 0.1), white);
+        }
+
+        .card[data-level="4"] {
+            border-left: 3px solid #9E9E9E;
+        }
+
+        .card[data-level="3"] {
+            border-left: 2px solid #CD7F32;
+        }
+
+        .card[data-level="2"] {
+            border-left: 2px solid #2196F3;
+        }
+
+        .card[data-level="1"] {
+            border-left: 2px solid #4CAF50;
+        }
+
+        /* 等級徽章 */
+        .level-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #fbc02d;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Popup 樣式 */
+        .map-popup {
+            position: relative;
+        }
+
+        .map-popup.level-5 {
+            background: linear-gradient(to right, rgba(251, 192, 45, 0.1), white);
+        }
+
+        .map-popup.level-5::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: #fbc02d;
+        }
+
+        /* 自定義地標樣式 */
+        .custom-marker {
+            width: 30px;
+            height: 30px;
+        }
+
+        .custom-marker i {
+            font-size: 16px;
         }
 
         .card img {
@@ -412,7 +478,67 @@
             margin: 0;
         }
 
-        
+        /* 搜尋輸入框容器 */
+        .search-input {
+            position: relative;
+            margin-bottom: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 搜尋圖標 */
+        .search-input .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        /* 清除按鈕 */
+        .search-input .clear-button {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 4px;
+            display: none;
+            /* 預設隱藏 */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-input .clear-button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .search-input .clear-button.visible {
+            display: flex;
+        }
+
+        /* 輸入框 */
+        .search-input input {
+            width: 100%;
+            padding: 12px 40px;
+            /* 左右都留空間給圖標 */
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .search-input input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(251, 192, 45, 0.3);
+        }
     </style>
 </head>
 
@@ -421,26 +547,36 @@
         <i class="fas fa-bars"></i>
     </button>
 
-    <div id="app">
-        <div id="sidebar">
-            <div id="search">
-                <!-- 整合的搜尋輸入框 -->
-                <div class="search-input">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchText" placeholder="搜尋店名或地址...">
-                </div>
-
-                <!-- 標籤搜尋按鈕 -->
-                <button id="tagSearchButton" class="tag-search-button">
-                    <i class="fas fa-tags"></i>
-                    <span class="default-text">選擇標籤...</span>
-                    <div id="selectedTags"></div>
-                </button>
-            </div>
-            <div id="cards"></div>
+    <div>
+        <div class="header" id="title">
+            屋拎人生地圖 youtube ig
         </div>
-        <div id="map"></div>
+        <div id="app">
+            <div id="sidebar">
+                <div id="search">
+                    <!-- 整合的搜尋輸入框 -->
+                    <!-- 搜尋輸入框 -->
+                    <div class="search-input">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="searchText" placeholder="搜尋店名或地址...">
+                        <button class="clear-button" id="clearSearch">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+    
+                    <!-- 標籤搜尋按鈕 -->
+                    <button id="tagSearchButton" class="tag-search-button">
+                        <i class="fas fa-tags"></i>
+                        <span class="default-text">選擇標籤...</span>
+                        <div id="selectedTags"></div>
+                    </button>
+                </div>
+                <div id="cards"></div>
+            </div>
+            <div id="map"></div>
+        </div>
     </div>
+   
 
     <!-- 標籤選擇彈窗 -->
     <div id="tagModal" class="tag-modal">
@@ -483,7 +619,9 @@
                 { type: 'instagram', title: 'Instagram', url: 'https://www.instagram.com/p/C8rI0RgSaVA/' }
             ],
             level: 5,
-            img: ['https://instagram.frmq2-2.fna.fbcdn.net/v/t51.2885-15/475580469_488193844039813_4900564716188244343_n.jpg'],
+            img: ['https://scontent.frmq2-2.fna.fbcdn.net/v/t39.30808-6/474797737_1026759439487051_7170254204379045195_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=1NJwLEOf2jcQ7kNvgGKNhiH&_nc_oc=Adjawx-WrzUHWHDEW7Keh9oeJSULvgcWwVJZ-hlFlmBBabITDednbepNDdlYC9JpSqo&_nc_zt=23&_nc_ht=scontent.frmq2-2.fna&_nc_gid=AcVT89ueLjxQdz0jITJG3RE&oh=00_AYDThmE5E_OJK-YiQN2-pOshBKXYvl6gSsWOIMQi5XD2dQ&oe=67A9EF6A'
+                , 'https://scontent.frmq2-1.fna.fbcdn.net/v/t39.30808-6/474975202_1026740716155590_6581208547720586944_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_ohc=5LXKntU7fw4Q7kNvgH8WQjm&_nc_oc=AdhsUZFYP_Jd6rkFAHAmDAgcI8AVGGOVp2H7LGj4hDJPiugsRRDLBzYkv9yFgLr_61A&_nc_zt=23&_nc_ht=scontent.frmq2-1.fna&_nc_gid=AZO2FvfAl2VLNF-0cALiGP9&oh=00_AYBhME74kAF9aWFKy69qMrNKxw0ZaTimjOQEQHLQlY9D2A&oe=67A9D51F'
+            ],
             tags: ['白沙屯美食'],
             foodCategories: ['瑪德蓮', '甜點', '蛋糕']
         }, {
@@ -514,7 +652,9 @@
                 { type: 'instagram', title: 'Instagram', url: 'https://www.instagram.com/p/C8rI0RgSaVA/' }
             ],
             level: 4,
-            img: ['https://instagram.frmq2-2.fna.fbcdn.net/v/t51.2885-15/475580469_488193844039813_4900564716188244343_n.jpg'],
+            img: ['https://scontent.frmq2-2.fna.fbcdn.net/v/t39.30808-6/474797737_1026759439487051_7170254204379045195_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=1NJwLEOf2jcQ7kNvgGKNhiH&_nc_oc=Adjawx-WrzUHWHDEW7Keh9oeJSULvgcWwVJZ-hlFlmBBabITDednbepNDdlYC9JpSqo&_nc_zt=23&_nc_ht=scontent.frmq2-2.fna&_nc_gid=AcVT89ueLjxQdz0jITJG3RE&oh=00_AYDThmE5E_OJK-YiQN2-pOshBKXYvl6gSsWOIMQi5XD2dQ&oe=67A9EF6A'
+                , 'https://scontent.frmq2-1.fna.fbcdn.net/v/t39.30808-6/474975202_1026740716155590_6581208547720586944_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_ohc=5LXKntU7fw4Q7kNvgH8WQjm&_nc_oc=AdhsUZFYP_Jd6rkFAHAmDAgcI8AVGGOVp2H7LGj4hDJPiugsRRDLBzYkv9yFgLr_61A&_nc_zt=23&_nc_ht=scontent.frmq2-1.fna&_nc_gid=AZO2FvfAl2VLNF-0cALiGP9&oh=00_AYBhME74kAF9aWFKy69qMrNKxw0ZaTimjOQEQHLQlY9D2A&oe=67A9D51F'
+            ],
             tags: ['白沙屯美食'],
             foodCategories: ['火鍋']
         }, {
@@ -627,28 +767,81 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // 添加地圖標記
+        // 定義不同等級的樣式
+        const levelStyles = {
+            5: {
+                color: '#fbc02d',     // 金色
+                markerColor: 'gold',
+                borderWidth: '4px'
+            },
+            4: {
+                color: '#9E9E9E',     // 銀色
+                markerColor: 'gray',
+                borderWidth: '3px'
+            },
+            3: {
+                color: '#CD7F32',     // 銅色
+                markerColor: 'orange',
+                borderWidth: '2px'
+            },
+            2: {
+                color: '#2196F3',     // 藍色
+                markerColor: 'blue',
+                borderWidth: '2px'
+            },
+            1: {
+                color: '#4CAF50',     // 綠色
+                markerColor: 'green',
+                borderWidth: '2px'
+            }
+        };
+
+        // 添加地圖標記和綁定事件
         const markers = {};
         data.forEach(item => {
             if (item.geoJson && item.geoJson.features) {
                 item.geoJson.features.forEach(feature => {
                     if (feature.geometry.type === 'Point') {
                         const [lng, lat] = feature.geometry.coordinates;
-                        const marker = L.marker([lat, lng]).addTo(map);
+
+                        // 創建自定義圖標
+                        const levelStyle = levelStyles[item.level] || levelStyles[1];
+                        const markerIcon = L.divIcon({
+                            className: `custom-marker level-${item.level}`,
+                            html: `<div style="
+                        background-color: white;
+                        border: ${levelStyle.borderWidth} solid ${levelStyle.color};
+                        border-radius: 50%;
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    ">
+                        <i class="fas fa-map-marker-alt" style="color: ${levelStyle.color};"></i>
+                    </div>`,
+                            iconSize: [30, 30],
+                            iconAnchor: [15, 15]
+                        });
+
+                        const marker = L.marker([lat, lng], {
+                            icon: markerIcon
+                        }).addTo(map);
 
                         // 創建可點擊的 popup 內容
                         const popupContent = `
-                    <div class="map-popup" style="cursor: pointer;" onclick="highlightCard('${item.id}')">
+                    <div class="map-popup level-${item.level}" style="cursor: pointer;" onclick="highlightCard('${item.id}')">
                         <img src="${item.img[0]}" alt="${item.title}">
                         <h3>${item.title}</h3>
                         <p>${item.address}</p>
+                         ${item.level === 5 ? '<div class="level-badge">⭐ 推薦</div>' : ''}
                     </div>
                 `;
 
                         // 創建並綁定 popup
                         const popup = L.popup({
                             closeButton: true,
-                            className: 'custom-popup'
+                            className: `custom-popup level-${item.level}`
                         }).setContent(popupContent);
 
                         marker.bindPopup(popup);
@@ -656,7 +849,7 @@
 
                         // 為標記添加點擊事件
                         marker.on('click', () => {
-                            highlightCard2(item.id);
+                            highlightCard(item.id);
                         });
                     }
                 });
@@ -837,6 +1030,109 @@
         updateSelectedTagsDisplay();
         renderCards();
 
+        // 獲取元素
+        const searchInput = document.getElementById('searchText');
+        const clearButton = document.getElementById('clearSearch');
+
+        // 監聽輸入框變化，控制清除按鈕的顯示
+        searchInput.addEventListener('input', () => {
+            clearButton.classList.toggle('visible', searchInput.value.length > 0);
+        });
+
+        // 清除按鈕點擊事件
+        clearButton.addEventListener('click', () => {
+            searchInput.value = '';
+            clearButton.classList.remove('visible');
+            handleSearch(); // 觸發搜尋更新
+            searchInput.focus(); // 保持輸入框焦點
+        });
+
+
+
+
+
+        // 創建自定義位置控制按鈕
+        L.Control.LocationButton = L.Control.extend({
+            options: {
+                position: 'topright'
+            },
+
+            onAdd: function (map) {
+                this._map = map;
+                const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+                const button = L.DomUtil.create('a', 'location-button', container);
+
+                button.innerHTML = '📍';
+                button.href = '#';
+                button.title = '定位當前位置';
+                button.style.cssText = `
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            font-size: 18px;
+            background-color: white;
+            display: block;
+            border-radius: 4px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+            cursor: pointer;
+            text-decoration: none;
+        `;
+
+                L.DomEvent.on(button, 'click', this._getCurrentLocation, this);
+                L.DomEvent.disableClickPropagation(container);
+
+                this._button = button;
+                return container;
+            },
+
+            _getCurrentLocation: function (e) {
+                e.preventDefault();
+                const button = this._button;
+                button.innerHTML = '⌛';
+                button.style.backgroundColor = '#f0f0f0';
+
+                // 初始化或更新標記
+                if (!this._locationMarker) {
+                    this._locationMarker = L.marker([0, 0], {
+                        icon: L.divIcon({
+                            className: 'current-location-marker',
+                            html: '📍',
+                            iconSize: [24, 24],
+                            iconAnchor: [12, 24]
+                        })
+                    }).addTo(this._map);
+                }
+
+                // 使用簡單的 getCurrentPosition
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+
+                        this._locationMarker.setLatLng([lat, lng]);
+                        this._map.setView([lat, lng], 16);
+
+                        button.innerHTML = '📍';
+                        button.style.backgroundColor = 'white';
+                    },
+                    (error) => {
+                        console.error('Location error:', error);
+                        alert('無法取得位置資訊，請確認GPS已開啟且已允許位置權限。');
+                        button.innerHTML = '📍';
+                        button.style.backgroundColor = 'white';
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 0
+                    }
+                );
+            }
+        });
+
+        // 添加定位按鈕到地圖
+        new L.Control.LocationButton().addTo(map);
     </script>
 </body>
 
