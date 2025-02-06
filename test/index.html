@@ -376,6 +376,43 @@
         #sidebar {
             scroll-behavior: smooth;
         }
+
+
+        /* Popup 樣式 */
+        .custom-popup .leaflet-popup-content {
+            margin: 0;
+            padding: 0;
+        }
+
+        .map-popup {
+            padding: 10px;
+            transition: background-color 0.2s;
+        }
+
+        .map-popup:hover {
+            background-color: rgba(251, 192, 45, 0.1);
+        }
+
+        .map-popup img {
+            width: 200px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .map-popup h3 {
+            margin-bottom: 5px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .map-popup p {
+            color: #666;
+            margin: 0;
+        }
+
+        
     </style>
 </head>
 
@@ -542,6 +579,18 @@
             });
         }
 
+        // 更新標籤按鈕狀態
+        function updateTagButtons() {
+            const tagButtons = document.querySelectorAll('.tag-button');
+            tagButtons.forEach(button => {
+                if (selectedTags.has(button.textContent)) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+        }
+
         // 更新已選擇的標籤顯示
         function updateSelectedTagsDisplay() {
             const selectedTagsContainer = document.getElementById('selectedTags');
@@ -587,20 +636,27 @@
                         const [lng, lat] = feature.geometry.coordinates;
                         const marker = L.marker([lat, lng]).addTo(map);
 
+                        // 創建可點擊的 popup 內容
                         const popupContent = `
-                    <div class="map-popup">
+                    <div class="map-popup" style="cursor: pointer;" onclick="highlightCard('${item.id}')">
                         <img src="${item.img[0]}" alt="${item.title}">
                         <h3>${item.title}</h3>
                         <p>${item.address}</p>
                     </div>
                 `;
 
-                        marker.bindPopup(popupContent);
+                        // 創建並綁定 popup
+                        const popup = L.popup({
+                            closeButton: true,
+                            className: 'custom-popup'
+                        }).setContent(popupContent);
+
+                        marker.bindPopup(popup);
                         markers[item.id] = marker;
 
                         // 為標記添加點擊事件
                         marker.on('click', () => {
-                            highlightCard(item.id);
+                            highlightCard2(item.id);
                         });
                     }
                 });
@@ -609,7 +665,8 @@
 
 
         // 高亮顯示對應的卡片
-        function highlightCard(itemId) {
+        // 確保 highlightCard 函數在全局範圍可用
+        window.highlightCard = function (itemId) {
             const cards = document.querySelectorAll('.card');
             const targetCard = Array.from(cards).find(card => card.getAttribute('data-id') === itemId);
 
@@ -628,7 +685,26 @@
                     document.getElementById('sidebar').classList.add('active');
                 }
             }
-        }
+        };
+
+        // 高亮顯示對應的卡片
+        // 確保 highlightCard 函數在全局範圍可用
+        window.highlightCard2 = function (itemId) {
+            const cards = document.querySelectorAll('.card');
+            const targetCard = Array.from(cards).find(card => card.getAttribute('data-id') === itemId);
+
+            if (targetCard) {
+                // 移除其他卡片的高亮效果
+                cards.forEach(card => card.classList.remove('highlight'));
+
+                // 添加高亮效果到目標卡片
+                targetCard.classList.add('highlight');
+
+                // 滾動到目標卡片
+                targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            }
+        };
 
         // 渲染資訊卡
         function renderCards(filteredData = data) {
@@ -641,15 +717,24 @@
                 card.setAttribute('data-level', item.level);
                 card.setAttribute('data-id', item.id); // 添加 ID 屬性用於標識卡片
 
-                card.onclick = () => {
-                    const marker = markers[item.id];
-                    if (marker) {
-                        map.setView(marker.getLatLng(), 15);
-                        marker.openPopup();
-                    }
-                    // 在手機版點擊卡片後關閉側邊欄
-                    if (window.innerWidth <= 768) {
-                        document.getElementById('sidebar').classList.remove('active');
+                // 修改點擊事件，檢查點擊的元素
+                card.onclick = (event) => {
+                    // 檢查點擊的元素是否在連結區域內
+                    const isClickedOnLink =
+                        event.target.closest('a') ||
+                        event.target.closest('.tag');
+
+                    // 如果不是點擊在連結上，才執行地圖定位
+                    if (!isClickedOnLink) {
+                        const marker = markers[item.id];
+                        if (marker) {
+                            map.setView(marker.getLatLng(), 25);
+                            marker.openPopup();
+                        }
+                        // 在手機版點擊卡片後關閉側邊欄
+                        if (window.innerWidth <= 768) {
+                            document.getElementById('sidebar').classList.remove('active');
+                        }
                     }
                 };
 
