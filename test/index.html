@@ -501,7 +501,7 @@
 
             /* 基礎布局調整 */
             #app {
-                margin-top:0px;
+                margin-top: 0px;
                 grid-template-columns: 1fr;
                 transition: all 0.3s ease-in-out;
                 height: 100vh;
@@ -844,6 +844,47 @@
         .modal-google-earth {
             background: #4285F4;
         }
+
+
+
+        .marker-container {
+            position: relative;
+            width: 27px;
+            height: 41px;
+            transform-origin: center bottom;
+        }
+
+        .marker-label {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+            margin-bottom: 5px;
+        }
+
+        .marker-container:hover .marker-label {
+            z-index: 1000;
+        }
+
+        .leaflet-marker-icon {
+            transition: transform 0.2s ease-out !important;
+        }
+
+        .leaflet-marker-icon:hover {
+            z-index: 1000 !important;
+        }
+
+        .leaflet-marker-icon.leaflet-zoom-animated {
+            transition: transform 0.25s cubic-bezier(0, 0, 0.25, 1);
+        }
     </style>
 </head>
 
@@ -940,6 +981,10 @@
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
     <script>
         const data = [{
             id: 'id11',
@@ -1113,7 +1158,9 @@
         }
 
         // 初始化地圖
-        const map = L.map('map').setView([24.5703745, 120.7099826], 13);
+        const map = L.map('map',{
+            zoomControl: false  // 禁用縮放控制按鈕
+        }).setView([24.5703745, 120.7099826], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
@@ -1149,6 +1196,17 @@
 
         // 添加地圖標記和綁定事件
         const markers = {};
+        // 首先創建一個marker cluster group來處理重疊問題
+        const markerClusterGroup = L.markerClusterGroup({
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true,
+            disableClusteringAtZoom: 18, // 在最大縮放級別禁用聚合
+            maxClusterRadius: 40,
+            animate: true,
+            animateAddingMarkers: false // 禁用添加標記時的動畫
+        });
+
         data.forEach(item => {
             if (item.geoJson && item.geoJson.features) {
                 item.geoJson.features.forEach(feature => {
@@ -1159,25 +1217,23 @@
                         const levelStyle = levelStyles[item.level] || levelStyles[1];
                         const markerIcon = L.divIcon({
                             className: `custom-marker level-${item.level}`,
-                            html: `<div style="
-                        background-color: white;
-                        border: ${levelStyle.borderWidth} solid ${levelStyle.color};
-                        border-radius: 50%;
-                        width: 100%;
-                        height: 100%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    ">
-                        <i class="fas fa-map-marker-alt" style="color: ${levelStyle.color};"></i>
-                    </div>`,
-                            iconSize: [30, 30],
-                            iconAnchor: [15, 15]
+                            html: `
+                        <div class="marker-container">
+                            <div class="marker-label">${item.title}</div>
+                            <svg display="block" height="41px" width="27px" viewBox="0 0 27 41" style="fill: ${levelStyle.color}">
+                                <path d="M27,13.5C27,19.07 20.25,27 14.75,34.5C14.02,35.5 12.98,35.5 12.25,34.5C6.75,27 0,19.22 0,13.5C0,6.04 6.04,0 13.5,0C20.96,0 27,6.04 27,13.5Z"></path>
+                                <path opacity="0.25" d="M13.5,0C6.04,0 0,6.04 0,13.5C0,19.22 6.75,27 12.25,34.5C13,35.52 14.02,35.5 14.75,34.5C20.25,27 27,19.07 27,13.5C27,6.04 20.96,0 13.5,0ZM13.5,1C20.42,1 26,6.58 26,13.5C26,15.9 24.5,19.18 22.22,22.74C19.95,26.3 16.71,30.14 13.94,33.91C13.74,34.18 13.61,34.32 13.5,34.44C13.39,34.32 13.26,34.18 13.06,33.91C10.28,30.13 7.41,26.31 5.02,22.77C2.62,19.23 1,15.95 1,13.5C1,6.58 6.58,1 13.5,1Z"></path>
+                                <circle fill="white" cx="13.5" cy="13.5" r="5.5"></circle>
+                            </svg>
+                        </div>`,
+                            iconSize: [30, 41],
+                            iconAnchor: [15, 41],
+                            popupAnchor: [0, -34]
                         });
 
                         const marker = L.marker([lat, lng], {
                             icon: markerIcon
-                        }).addTo(map);
+                        });
 
                         // 創建可點擊的 popup 內容
                         const popupContent = `
@@ -1185,27 +1241,52 @@
                         <img src="${item.img[0]}" alt="${item.title}">
                         <h3>${item.title}</h3>
                         <p>${item.address}</p>
-                         ${item.level === 5 ? '<div class="level-badge">⭐ 推薦</div>' : ''}
+                        ${item.level === 5 ? '<div class="level-badge">⭐ 推薦</div>' : ''}
                     </div>
                 `;
 
-                        // 創建並綁定 popup
                         const popup = L.popup({
                             closeButton: true,
-                            className: `custom-popup level-${item.level}`
+                            className: `custom-popup level-${item.level}`,
+                            autoPan: false // 禁用自動平移
                         }).setContent(popupContent);
 
                         marker.bindPopup(popup);
                         markers[item.id] = marker;
 
-                        // 為標記添加點擊事件
+                        // 修改點擊事件處理
                         marker.on('click', () => {
+                            // 先高亮顯示卡片
                             highlightCard2(item.id);
+
+                            // 確保標記已經從群集中展開
+                            if (markerClusterGroup.hasLayer(marker)) {
+                                markerClusterGroup.zoomToShowLayer(marker, () => {
+                                    map.setView(marker.getLatLng(), 18, {
+                                        animate: true,
+                                        duration: 0.5,
+                                        noMoveStart: true // 防止移動開始事件
+                                    });
+                                    marker.openPopup();
+                                });
+                            } else {
+                                map.setView(marker.getLatLng(), 18, {
+                                    animate: true,
+                                    duration: 0.5,
+                                    noMoveStart: true
+                                });
+                                marker.openPopup();
+                            }
                         });
+
+                        markerClusterGroup.addLayer(marker);
                     }
                 });
             }
         });
+
+        // 將 markerClusterGroup 添加到地圖
+        map.addLayer(markerClusterGroup);
 
 
         // 高亮顯示對應的卡片
@@ -1270,7 +1351,10 @@
                     if (isClickableArea) {
                         const marker = markers[item.id];
                         if (marker) {
-                            map.setView(marker.getLatLng(), 25);
+                            map.flyTo(marker.getLatLng(), 18, {
+                                duration: 0.5,  // 動畫持續時間（秒）
+                                animate: true  // 啟用動
+                            });
                             marker.openPopup();
                         }
                         if (window.innerWidth <= 768) {
