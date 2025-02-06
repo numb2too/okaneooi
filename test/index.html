@@ -501,6 +501,7 @@
 
             /* 基礎布局調整 */
             #app {
+                margin-top:0px;
                 grid-template-columns: 1fr;
                 transition: all 0.3s ease-in-out;
                 height: 100vh;
@@ -669,13 +670,186 @@
                 border: 2px solid transparent;
                 background-clip: padding-box;
             }
+
+            .modal-content {
+                padding: 2rem 1.5rem;
+                width: 95%;
+                margin: 1rem;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .modal-description {
+                font-size: 0.9rem;
+                margin-bottom: 1rem;
+            }
+
+            .modal-social-links {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .modal-social-link {
+                padding: 0.75rem;
+            }
+
+            .close-modal {
+                top: 15px;
+                right: 15px;
+                width: 32px;
+                height: 32px;
+                font-size: 20px;
+            }
+        }
+
+        /* 模態框基礎樣式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 20px;
+            padding: 2.5rem;
+            position: relative;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        /* 關閉按鈕 */
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0, 0, 0, 0.1);
+            color: #666;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .close-modal:hover {
+            background: rgba(0, 0, 0, 0.2);
+            color: #333;
+            transform: rotate(90deg);
+        }
+
+        /* 標題和描述 */
+        .modal-title {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .modal-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .modal-description:last-of-type {
+            margin-bottom: 2rem;
+        }
+
+        /* 社群連結 */
+        .modal-social-links {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .modal-social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #fff;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-social-link:hover {
+            transform: translateY(-2px);
+        }
+
+        .modal-social-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-social-link:hover::before {
+            transform: translateX(0);
+        }
+
+        /* 社群按鈕顏色 */
+        .modal-instagram {
+            background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+        }
+
+        .modal-youtube {
+            background: #FF0000;
+        }
+
+        .modal-google-earth {
+            background: #4285F4;
         }
     </style>
 </head>
 
 <body>
     <header class="page-header">
-        <h1>
+        <h1 id="title" onclick="openModal()">
             <i class="fas fa-utensils"></i>
             美食地圖
         </h1>
@@ -724,6 +898,47 @@
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal" id="titleModal">
+        <div class="modal-content">
+            <button class="close-modal" aria-label="關閉視窗">
+                <span>&times;</span>
+            </button>
+
+            <header class="modal-header">
+                <h2 class="modal-title">歡迎來到屋拎人生！</h2>
+            </header>
+
+            <div class="modal-body">
+                <p class="modal-description" lang="zh-TW">
+                    人生不容易啊 世事難料 把握當下 紀錄周遭的每一刻 跟著我一起探索世界的每個時光吧~
+                </p>
+                <p class="modal-description" lang="ja">
+                    人生は簡単ではなく、何が起こるか分からない。だからこそ、今を大切にして、周りの一瞬一瞬を記録しよう。私と一緒に、世界のあらゆる瞬間を探索しませんか~
+                </p>
+            </div>
+
+            <footer class="modal-social-links">
+                <a href="https://www.instagram.com/food_okaneooi/" target="_blank" rel="noopener noreferrer"
+                    class="modal-social-link modal-instagram">
+                    <i class="fab fa-instagram"></i>
+                    <span>Instagram</span>
+                </a>
+
+                <a href="https://www.youtube.com/@wlintvvv" target="_blank" rel="noopener noreferrer"
+                    class="modal-social-link modal-youtube">
+                    <i class="fab fa-youtube"></i>
+                    <span>YouTube</span>
+                </a>
+
+                <a href="https://earth.google.com/earth/d/13YQZGQ_4m_231FCcwAN1bQjUKicYlEzc" target="_blank"
+                    rel="noopener noreferrer" class="modal-social-link modal-google-earth">
+                    <i class="fas fa-globe"></i>
+                    <span>Google Earth</span>
+                </a>
+            </footer>
+        </div>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
     <script>
         const data = [{
@@ -1274,6 +1489,31 @@
 
         // 添加定位按鈕到地圖
         new L.Control.LocationButton().addTo(map);
+
+
+        // Modal 功能
+        // 打開模態框
+        function openModal() {
+            const modal = document.getElementById('titleModal');
+            modal.classList.add('active');
+        }
+
+        // 關閉模態框
+        function closeModal() {
+            const modal = document.getElementById('titleModal');
+            modal.classList.remove('active');
+        }
+
+        // 點擊關閉按鈕時關閉模態框
+        document.querySelector('.close-modal').addEventListener('click', closeModal);
+
+        // 點擊背景時關閉模態框
+        document.getElementById('titleModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                closeModal();
+            }
+        });
+
     </script>
 </body>
 
