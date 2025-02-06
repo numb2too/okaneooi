@@ -364,6 +364,18 @@
             border-radius: 8px;
             margin-bottom: 10px;
         }
+
+        /* 卡片高亮效果 */
+        .card.highlight {
+            border: 2px solid #fbc02d;
+            box-shadow: 0 4px 12px rgba(251, 192, 45, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* 確保平滑滾動效果 */
+        #sidebar {
+            scroll-behavior: smooth;
+        }
     </style>
 </head>
 
@@ -437,7 +449,7 @@
             img: ['https://instagram.frmq2-2.fna.fbcdn.net/v/t51.2885-15/475580469_488193844039813_4900564716188244343_n.jpg'],
             tags: ['白沙屯美食'],
             foodCategories: ['瑪德蓮', '甜點', '蛋糕']
-        },{
+        }, {
             id: 'id12',
             type: 'food',
             title: '初來甜點スイーツ',
@@ -468,7 +480,7 @@
             img: ['https://instagram.frmq2-2.fna.fbcdn.net/v/t51.2885-15/475580469_488193844039813_4900564716188244343_n.jpg'],
             tags: ['白沙屯美食'],
             foodCategories: ['火鍋']
-        },{
+        }, {
             id: 'id13',
             type: 'food',
             title: '初來甜點スイーツ',
@@ -497,7 +509,7 @@
             ],
             level: 1,
             img: ['https://scontent.frmq2-2.fna.fbcdn.net/v/t39.30808-6/474797737_1026759439487051_7170254204379045195_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=1NJwLEOf2jcQ7kNvgGKNhiH&_nc_oc=Adjawx-WrzUHWHDEW7Keh9oeJSULvgcWwVJZ-hlFlmBBabITDednbepNDdlYC9JpSqo&_nc_zt=23&_nc_ht=scontent.frmq2-2.fna&_nc_gid=AcVT89ueLjxQdz0jITJG3RE&oh=00_AYDThmE5E_OJK-YiQN2-pOshBKXYvl6gSsWOIMQi5XD2dQ&oe=67A9EF6A'
-                ,'https://scontent.frmq2-1.fna.fbcdn.net/v/t39.30808-6/474975202_1026740716155590_6581208547720586944_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_ohc=5LXKntU7fw4Q7kNvgH8WQjm&_nc_oc=AdhsUZFYP_Jd6rkFAHAmDAgcI8AVGGOVp2H7LGj4hDJPiugsRRDLBzYkv9yFgLr_61A&_nc_zt=23&_nc_ht=scontent.frmq2-1.fna&_nc_gid=AZO2FvfAl2VLNF-0cALiGP9&oh=00_AYBhME74kAF9aWFKy69qMrNKxw0ZaTimjOQEQHLQlY9D2A&oe=67A9D51F'
+                , 'https://scontent.frmq2-1.fna.fbcdn.net/v/t39.30808-6/474975202_1026740716155590_6581208547720586944_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_ohc=5LXKntU7fw4Q7kNvgH8WQjm&_nc_oc=AdhsUZFYP_Jd6rkFAHAmDAgcI8AVGGOVp2H7LGj4hDJPiugsRRDLBzYkv9yFgLr_61A&_nc_zt=23&_nc_ht=scontent.frmq2-1.fna&_nc_gid=AZO2FvfAl2VLNF-0cALiGP9&oh=00_AYBhME74kAF9aWFKy69qMrNKxw0ZaTimjOQEQHLQlY9D2A&oe=67A9D51F'
             ],
             tags: ['白沙屯美食'],
             foodCategories: ['拉麵', '米糕']
@@ -585,10 +597,38 @@
 
                         marker.bindPopup(popupContent);
                         markers[item.id] = marker;
+
+                        // 為標記添加點擊事件
+                        marker.on('click', () => {
+                            highlightCard(item.id);
+                        });
                     }
                 });
             }
         });
+
+
+        // 高亮顯示對應的卡片
+        function highlightCard(itemId) {
+            const cards = document.querySelectorAll('.card');
+            const targetCard = Array.from(cards).find(card => card.getAttribute('data-id') === itemId);
+
+            if (targetCard) {
+                // 移除其他卡片的高亮效果
+                cards.forEach(card => card.classList.remove('highlight'));
+
+                // 添加高亮效果到目標卡片
+                targetCard.classList.add('highlight');
+
+                // 滾動到目標卡片
+                targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // 在手機版中打開側邊欄
+                if (window.innerWidth <= 768) {
+                    document.getElementById('sidebar').classList.add('active');
+                }
+            }
+        }
 
         // 渲染資訊卡
         function renderCards(filteredData = data) {
@@ -599,6 +639,7 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.setAttribute('data-level', item.level);
+                card.setAttribute('data-id', item.id); // 添加 ID 屬性用於標識卡片
 
                 card.onclick = () => {
                     const marker = markers[item.id];
