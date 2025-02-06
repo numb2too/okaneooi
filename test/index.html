@@ -85,12 +85,15 @@
             cursor: pointer;
         }
 
-        /* 搜尋區域 */
-        #search {
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
+         /* 搜尋區域 */
+         #search {
+                transition: transform 0.3s ease, opacity 0.3s ease;
+                position: sticky;
+                top: 0;
+                background: rgba(245, 245, 245, 0.98);
+                z-index: 10;
+                padding: 15px;
+            }
         .search-input {
             position: relative;
             margin-bottom: 15px;
@@ -281,6 +284,10 @@
             color: white;
         }
 
+        #cards{
+                overflow-y: auto;
+        }
+
         /* 卡片設計 */
         .card {
             position: relative;
@@ -365,6 +372,12 @@
         .social-link.instagram {
             color: #e1306c;
         }
+
+         /* 側邊欄樣式 */
+         #sidebar {
+                display: flex;
+                flex-direction: column;
+            }
 
         /* 等級樣式 */
         .card[data-level="5"] {
@@ -566,13 +579,26 @@
 
             /* 搜尋區域 */
             #search {
-                padding: 15px;
-                background: rgba(245, 245, 245, 0.98);
+                transition: transform 0.3s ease, opacity 0.3s ease;
                 position: sticky;
                 top: 0;
+                background: rgba(245, 245, 245, 0.98);
                 z-index: 10;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-                flex-shrink: 0;
+                padding: 15px;
+            }
+
+            #search.hide {
+                transform: translateY(-100%);
+                opacity: 0;
+                pointer-events: none;
+                display: none;
+            }
+
+            #search.show {
+                transform: translateY(0);
+                opacity: 1;
+                pointer-events: auto;
+                display: unset;
             }
 
             /* 標籤按鈕 */
@@ -1599,13 +1625,78 @@
         });
 
 
-        // 監聽返回事件
-        window.addEventListener('popstate', function (event) {
-            if (window.innerWidth <= 768) {
-                document.getElementById('sidebar').classList.remove('active');
+
+
+        // 初始化變量
+        let lastScrollTop = 0;
+        let isSearchVisible = true;
+        const searchArea = document.getElementById('search');
+        const cardsContainer = document.getElementById('cards');
+
+        // 設置一個閾值，決定多少滾動距離後觸發隱藏/顯示
+        const SCROLL_THRESHOLD = 10;
+
+        // 添加滾動事件監聽器
+        cardsContainer.addEventListener('scroll', () => {
+            if (window.innerWidth > 768) return; // 只在手機版執行
+
+            const currentScroll = cardsContainer.scrollTop;
+            const scrollDifference = currentScroll - lastScrollTop;
+
+            // 向上滾動超過閾值時顯示搜尋區
+            if (scrollDifference < -SCROLL_THRESHOLD) {
+                if (!isSearchVisible) {
+                    searchArea.classList.remove('hide');
+                    searchArea.classList.add('show');
+                    isSearchVisible = true;
+                }
+            }
+            // 向下滾動超過閾值時隱藏搜尋區
+            else if (scrollDifference > SCROLL_THRESHOLD) {
+                if (isSearchVisible && currentScroll > 50) { // 添加最小滾動距離判斷
+                    searchArea.classList.add('hide');
+                    searchArea.classList.remove('show');
+                    isSearchVisible = false;
+                }
+            }
+
+            lastScrollTop = currentScroll;
+        });
+
+        // 處理觸摸事件（為了更好的移動端體驗）
+        let touchStartY = 0;
+        cardsContainer.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        });
+
+        cardsContainer.addEventListener('touchmove', (e) => {
+            if (window.innerWidth > 768) return;
+
+            const touchCurrentY = e.touches[0].clientY;
+            const touchDifference = touchCurrentY - touchStartY;
+
+            // 向下滑動顯示搜尋區
+            if (touchDifference > 50 && !isSearchVisible) {
+                searchArea.classList.remove('hide');
+                searchArea.classList.add('show');
+                isSearchVisible = true;
+            }
+            // 向上滑動隱藏搜尋區
+            else if (touchDifference < -50 && isSearchVisible && cardsContainer.scrollTop > 50) {
+                searchArea.classList.add('hide');
+                searchArea.classList.remove('show');
+                isSearchVisible = false;
             }
         });
 
+        // 監聽視窗大小變化
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                // 在桌面版時重置搜尋區域狀態
+                searchArea.classList.remove('hide', 'show');
+                isSearchVisible = true;
+            }
+        });
 
     </script>
 </body>
