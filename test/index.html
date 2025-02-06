@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美食地圖</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft JhengHei", sans-serif;
+            overflow: hidden;
+        }
+
+        #app {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* 控制側邊欄的按鈕 */
+        #toggleSidebar {
+            display: none;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        /* 搜尋區域 */
+        #search {
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            position: relative;
+            margin-bottom: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-input i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .search-input input {
+            width: 100%;
+            padding: 12px 12px 12px 35px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        /* 標籤搜尋按鈕 */
+        .tag-search-button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            min-height: 45px;
+        }
+
+        .tag-search-button:hover {
+            background: #f5f5f5;
+        }
+
+        .tag-search-button i {
+            margin-right: 8px;
+            color: #666;
+        }
+
+        /* 選中的標籤樣式 */
+        .selected-tag {
+            background: #e0e0e0;
+            padding: 4px 8px;
+            border-radius: 16px;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .selected-tag .remove {
+            cursor: pointer;
+            color: #666;
+            font-size: 12px;
+            padding: 2px;
+        }
+
+        .selected-tag .remove:hover {
+            color: #000;
+        }
+
+        /* 標籤選擇彈窗 */
+        .tag-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .tag-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tag-modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .tag-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .tag-modal-header h3 {
+            margin: 0;
+        }
+
+        .tag-modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .tag-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag-button {
+            padding: 8px 16px;
+            border: 2px solid #ddd;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .tag-button:hover {
+            background: #f5f5f5;
+        }
+
+        .tag-button.active {
+            background: #fbc02d;
+            border-color: #fbc02d;
+            color: white;
+        }
+
+        /* 側邊欄 */
+        #sidebar {
+            background: #f5f5f5;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        /* 卡片設計 */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 0 15px 15px 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .card[data-level="5"] {
+            border-left: 4px solid #fbc02d;
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .card h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .card .remember {
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .card .address {
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* 連結樣式 */
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .link {
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: white;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .link i {
+            font-size: 16px;
+        }
+
+        .link.googleMap {
+            background: #4285f4;
+        }
+
+        .link.youtube {
+            background: #ff0000;
+        }
+
+        .link.instagram {
+            background: #e1306c;
+        }
+
+        /* 標籤樣式 */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background: #e0e0e0;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+        }
+
+        #map {
+            height: 100vh;
+            z-index: 1;
+        }
+
+        /* 手機版樣式 */
+        @media (max-width: 768px) {
+            #app {
+                grid-template-columns: 1fr;
+            }
+
+            #toggleSidebar {
+                display: block;
+            }
+
+            #sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                z-index: 1001;
+                transform: translateX(-100%);
+            }
+
+            #sidebar.active {
+                transform: translateX(0);
+            }
+
+            .tag-button {
+                padding: 10px 20px;
+                font-size: 16px;
+            }
+
+            .search-input input {
+                padding: 15px 15px 15px 40px;
+            }
+
+            .card {
+                margin: 0 15px 15px 15px;
+            }
+
+            .link {
+                padding: 10px 15px;
+                font-size: 16px;
+            }
+        }
+
+        /* 地圖彈出視窗樣式 */
+        .leaflet-popup-content {
+            padding: 10px;
+        }
+
+        .leaflet-popup-content h3 {
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .map-popup {
+            text-align: center;
+        }
+
+        .map-popup img {
+            width: 200px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="toggleSidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div id="app">
+        <div id="sidebar">
+            <div id="search">
+                <!-- 整合的搜尋輸入框 -->
+                <div class="search-input">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchText" placeholder="搜尋店名或地址...">
+                </div>
+
+                <!-- 標籤搜尋按鈕 -->
+                <button id="tagSearchButton" class="tag-search-button">
+                    <i class="fas fa-tags"></i>
+                    <span class="default-text">選擇標籤...</span>
+                    <div id="selectedTags"></div>
+                </button>
+            </div>
+            <div id="cards"></div>
+        </div>
+        <div id="map"></div>
+    </div>
+
+    <!-- 標籤選擇彈窗 -->
+    <div id="tagModal" class="tag-modal">
+        <div class="tag-modal-content">
+            <div class="tag-modal-header">
+                <h3>選擇標籤</h3>
+                <button class="tag-modal-close">&times;</button>
+            </div>
+            <div id="tagButtons" class="tag-buttons"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script>
+        const data = [{
+            id: 'id11',
+            type: 'food',
+            title: '初來甜點スイーツ',
+            remember: '我會為了瑪德蓮特地跑來吃。榛果可可瑪德蓮真的是好吃到一次吃三顆。來白沙屯甜點唯一首選',
+            address: '357苗栗縣通霄鎮12鄰67-3號',
+            geoJson: {
+                "type": "FeatureCollection",
+                "features": [{
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [120.7099826, 24.5703745, 0]
+                    },
+                    "properties": {
+                        "name": "初來甜點スイーツ",
+                        "stroke": "#fbc02d",
+                        "stroke-width": 2.28571
+                    }
+                }]
+            },
+            urls: [
+                { type: 'googleMap', title: 'Google地圖', url: 'https://maps.app.goo.gl/SRSkoRBe6SJXa6xn9' },
+                { type: 'youtube', title: 'YouTube', url: 'https://youtu.be/Kic6cLlAbLw' },
+                { type: 'youtube', title: 'YouTube短片', url: 'https://youtube.com/shorts/U6xkOqJ8ZIs' },
+                { type: 'instagram', title: 'Instagram', url: 'https://www.instagram.com/p/C8rI0RgSaVA/' }
+            ],
+            level: 5,
+            img: ['https://instagram.frmq2-2.fna.fbcdn.net/v/t51.2885-15/475580469_488193844039813_4900564716188244343_n.jpg'],
+            tags: ['白沙屯美食'],
+            foodCategories: ['瑪德蓮', '甜點', '蛋糕']
+        },{
+            id: 'id12',
+            type: 'food',
+            title: '初來甜點スイーツ',
+            remember: '我會為了瑪德蓮特地跑來吃。榛果可可瑪德蓮真的是好吃到一次吃三顆。來白沙屯甜點唯一首選',
+            address: '357苗栗縣通霄鎮12鄰67-3號',
+            geoJson: {
+                "type": "FeatureCollection",
+                "features": [{
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [120.7099, 24.5703745, 0]
+                    },
+                    "properties": {
+                        "name": "初來甜點スイーツ",
+                        "stroke": "#fbc02d",
+                        "stroke-width": 2.28571
+                    }
+                }]
+            },
+            urls: [
+                { type: 'googleMap', title: 'Google地圖', url: 'https://maps.app.goo.gl/SRSkoRBe6SJXa6xn9' },
+                { type: 'youtube', title: 'YouTube', url: 'https://youtu.be/Kic6cLlAbLw' },
+                { type: 'youtube', title: 'YouTube短片', url: 'https://youtube.com/shorts/U6xkOqJ8ZIs' },
+                { type: 'instagram', title: 'Instagram', url: 'https://www.instagram.com/p/C8rI0RgSaVA/' }
+            ],
+            level: 4,
+            img: ['https://instagram.frmq2-2.fna.fbcdn.net/v/t51.2885-15/475580469_488193844039813_4900564716188244343_n.jpg'],
+            tags: ['白沙屯美食'],
+            foodCategories: ['火鍋']
+        },{
+            id: 'id13',
+            type: 'food',
+            title: '初來甜點スイーツ',
+            remember: '我會為了瑪德蓮特地跑來吃。榛果可可瑪德蓮真的是好吃到一次吃三顆。來白沙屯甜點唯一首選',
+            address: '357大甲鎮12鄰67-3號',
+            geoJson: {
+                "type": "FeatureCollection",
+                "features": [{
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [120.709826, 24.570745, 0]
+                    },
+                    "properties": {
+                        "name": "初來甜點スイーツ",
+                        "stroke": "#fbc02d",
+                        "stroke-width": 2.28571
+                    }
+                }]
+            },
+            urls: [
+                { type: 'googleMap', title: 'Google地圖', url: 'https://maps.app.goo.gl/SRSkoRBe6SJXa6xn9' },
+                { type: 'youtube', title: 'YouTube', url: 'https://youtu.be/Kic6cLlAbLw' },
+                { type: 'youtube', title: 'YouTube短片', url: 'https://youtube.com/shorts/U6xkOqJ8ZIs' },
+                { type: 'instagram', title: 'Instagram', url: 'https://www.instagram.com/p/C8rI0RgSaVA/' }
+            ],
+            level: 1,
+            img: ['https://scontent.frmq2-2.fna.fbcdn.net/v/t39.30808-6/474797737_1026759439487051_7170254204379045195_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=1NJwLEOf2jcQ7kNvgGKNhiH&_nc_oc=Adjawx-WrzUHWHDEW7Keh9oeJSULvgcWwVJZ-hlFlmBBabITDednbepNDdlYC9JpSqo&_nc_zt=23&_nc_ht=scontent.frmq2-2.fna&_nc_gid=AcVT89ueLjxQdz0jITJG3RE&oh=00_AYDThmE5E_OJK-YiQN2-pOshBKXYvl6gSsWOIMQi5XD2dQ&oe=67A9EF6A'
+                ,'https://scontent.frmq2-1.fna.fbcdn.net/v/t39.30808-6/474975202_1026740716155590_6581208547720586944_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_ohc=5LXKntU7fw4Q7kNvgH8WQjm&_nc_oc=AdhsUZFYP_Jd6rkFAHAmDAgcI8AVGGOVp2H7LGj4hDJPiugsRRDLBzYkv9yFgLr_61A&_nc_zt=23&_nc_ht=scontent.frmq2-1.fna&_nc_gid=AZO2FvfAl2VLNF-0cALiGP9&oh=00_AYBhME74kAF9aWFKy69qMrNKxw0ZaTimjOQEQHLQlY9D2A&oe=67A9D51F'
+            ],
+            tags: ['白沙屯美食'],
+            foodCategories: ['拉麵', '米糕']
+        }];
+
+        // 收集所有標籤和食物分類
+        const allTags = [...new Set(data.flatMap(item => [...item.tags, ...item.foodCategories]))];
+        const selectedTags = new Set();
+
+        // 渲染標籤按鈕
+        function renderTagButtons() {
+            const container = document.getElementById('tagButtons');
+            container.innerHTML = '';
+
+            allTags.forEach(tag => {
+                const button = document.createElement('button');
+                button.className = `tag-button ${selectedTags.has(tag) ? 'active' : ''}`;
+                button.textContent = tag;
+                button.onclick = () => {
+                    if (selectedTags.has(tag)) {
+                        selectedTags.delete(tag);
+                    } else {
+                        selectedTags.add(tag);
+                    }
+                    updateSelectedTagsDisplay();
+                    button.classList.toggle('active');
+                    handleSearch();
+                };
+                container.appendChild(button);
+            });
+        }
+
+        // 更新已選擇的標籤顯示
+        function updateSelectedTagsDisplay() {
+            const selectedTagsContainer = document.getElementById('selectedTags');
+            const defaultText = document.querySelector('.default-text');
+            selectedTagsContainer.innerHTML = '';
+
+            if (selectedTags.size === 0) {
+                defaultText.style.display = 'inline';
+            } else {
+                defaultText.style.display = 'none';
+                selectedTags.forEach(tag => {
+                    const tagElement = document.createElement('span');
+                    tagElement.className = 'selected-tag';
+                    tagElement.innerHTML = `
+                ${tag}
+                <span class="remove" onclick="event.stopPropagation(); removeTag('${tag}')">×</span>
+            `;
+                    selectedTagsContainer.appendChild(tagElement);
+                });
+            }
+        }
+
+        // 移除標籤
+        function removeTag(tag) {
+            selectedTags.delete(tag);
+            updateSelectedTagsDisplay();
+            updateTagButtons();
+            handleSearch();
+        }
+
+        // 初始化地圖
+        const map = L.map('map').setView([24.5703745, 120.7099826], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // 添加地圖標記
+        const markers = {};
+        data.forEach(item => {
+            if (item.geoJson && item.geoJson.features) {
+                item.geoJson.features.forEach(feature => {
+                    if (feature.geometry.type === 'Point') {
+                        const [lng, lat] = feature.geometry.coordinates;
+                        const marker = L.marker([lat, lng]).addTo(map);
+
+                        const popupContent = `
+                    <div class="map-popup">
+                        <img src="${item.img[0]}" alt="${item.title}">
+                        <h3>${item.title}</h3>
+                        <p>${item.address}</p>
+                    </div>
+                `;
+
+                        marker.bindPopup(popupContent);
+                        markers[item.id] = marker;
+                    }
+                });
+            }
+        });
+
+        // 渲染資訊卡
+        function renderCards(filteredData = data) {
+            const cardsContainer = document.getElementById('cards');
+            cardsContainer.innerHTML = '';
+
+            filteredData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.setAttribute('data-level', item.level);
+
+                card.onclick = () => {
+                    const marker = markers[item.id];
+                    if (marker) {
+                        map.setView(marker.getLatLng(), 15);
+                        marker.openPopup();
+                    }
+                    // 在手機版點擊卡片後關閉側邊欄
+                    if (window.innerWidth <= 768) {
+                        document.getElementById('sidebar').classList.remove('active');
+                    }
+                };
+
+                const randomImg = item.img[Math.floor(Math.random() * item.img.length)];
+
+                card.innerHTML = `
+            <img src="${randomImg}" alt="${item.title}">
+            <h3>${item.title}</h3>
+            <p class="remember">${item.remember}</p>
+            <p class="address">
+                <i class="fas fa-map-marker-alt"></i>
+                ${item.address}
+            </p>
+            <div class="links">
+                ${item.urls.map(url => {
+                    let icon = '';
+                    switch (url.type) {
+                        case 'googleMap':
+                            icon = 'fa-map-marked-alt';
+                            break;
+                        case 'youtube':
+                            icon = 'fa-youtube';
+                            break;
+                        case 'instagram':
+                            icon = 'fa-instagram';
+                            break;
+                    }
+                    return `
+                        <a href="${url.url}" target="_blank" class="link ${url.type}">
+                            <i class="fab ${icon}"></i>
+                            ${url.title}
+                        </a>
+                    `;
+                }).join('')}
+            </div>
+            <div class="tags">
+                ${[...item.tags, ...item.foodCategories].map(tag => `
+                    <span class="tag">${tag}</span>
+                `).join('')}
+            </div>
+        `;
+
+                cardsContainer.appendChild(card);
+            });
+        }
+
+        // 搜尋功能
+        function handleSearch() {
+            const searchText = document.getElementById('searchText').value.toLowerCase();
+
+            const filteredData = data.filter(item => {
+                const textMatch =
+                    item.title.toLowerCase().includes(searchText) ||
+                    item.address.toLowerCase().includes(searchText);
+
+                const tagMatch = selectedTags.size === 0 ||
+                    [...item.tags, ...item.foodCategories].some(tag =>
+                        selectedTags.has(tag)
+                    );
+
+                return textMatch && tagMatch;
+            });
+
+            renderCards(filteredData);
+
+            // 更新地圖標記
+            Object.entries(markers).forEach(([id, marker]) => {
+                const isVisible = filteredData.some(item => item.id === id);
+                if (isVisible) {
+                    marker.addTo(map);
+                } else {
+                    marker.remove();
+                }
+            });
+        }
+
+        // 綁定事件監聽器
+        document.getElementById('searchText').addEventListener('input', handleSearch);
+        document.getElementById('toggleSidebar').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        // 標籤選擇彈窗事件
+        document.getElementById('tagSearchButton').onclick = () => {
+            document.getElementById('tagModal').classList.add('active');
+        };
+
+        document.querySelector('.tag-modal-close').onclick = () => {
+            document.getElementById('tagModal').classList.remove('active');
+        };
+
+        document.getElementById('tagModal').onclick = (e) => {
+            if (e.target === document.getElementById('tagModal')) {
+                document.getElementById('tagModal').classList.remove('active');
+            }
+        };
+
+        // 初始化
+        renderTagButtons();
+        updateSelectedTagsDisplay();
+        renderCards();
+
+    </script>
+</body>
+
+</html>
