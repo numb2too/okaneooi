@@ -1158,7 +1158,7 @@
         }
 
         // 初始化地圖
-        const map = L.map('map',{
+        const map = L.map('map', {
             zoomControl: false  // 禁用縮放控制按鈕
         }).setView([24.5703745, 120.7099826], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -1597,6 +1597,15 @@
                 closeModal();
             }
         });
+
+
+        // 監聽返回事件
+        window.addEventListener('popstate', function (event) {
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        });
+
 
     </script>
 </body>
