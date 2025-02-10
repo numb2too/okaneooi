@@ -1,44 +1,37 @@
 // 初始化地圖
 function initMap() {
     // 創建地圖實例
-    AppState.map = L.map('map', {
-        zoomControl: false  // 停用預設的縮放控制
-    }).setView([24.3451924, 120.6235944], 11);
+    AppState.map = L.map('map').setView([24.3451924, 120.6235944], 11);
     
     // 添加底圖
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(AppState.map);
 
-    // 創建自定義縮放控制並添加到右下角
-    L.control.zoom({
-        position: 'bottomright'
-    }).addTo(AppState.map);
+    // 跟踪當前選中的元素
+    AppState.currentHighlight = null;
+
+    // 點擊地圖時清除高亮
+    AppState.map.on('click', clearHighlight);
 
     // 添加所有標記和路線
     addMapFeatures();
-
-    // 添加標題覆蓋層
-    addTitleOverlay();
 }
 
-// 添加標題覆蓋層
-function addTitleOverlay() {
-    const titleOverlay = L.control({
-        position: 'topleft'
-    });
-
-    titleOverlay.onAdd = function(map) {
-        const div = L.DomUtil.create('div', 'map-title-overlay');
-        div.innerHTML = `
-            <div class="map-title">
-                <h2>${document.getElementById('mainTitle').textContent}</h2>
-            </div>
-        `;
-        return div;
-    };
-
-    titleOverlay.addTo(AppState.map);
+// 清除當前高亮
+function clearHighlight(e) {
+    if (e && e.originalEvent && e.originalEvent.target.classList.contains('marker-title')) {
+        return; // 忽略標題點擊事件
+    }
+    
+    if (AppState.currentHighlight) {
+        const { elements, styles } = AppState.currentHighlight;
+        elements.titleOverlay._icon.classList.remove('highlight');
+        if (elements.polyline) {
+            elements.polyline.setStyle(styles.normal);
+        }
+    }
+    AppState.currentHighlight = null;
 }
 
 // 添加地圖特徵（標記和路線）
@@ -60,56 +53,137 @@ function addMapFeatures() {
 function addMarker(feature, item) {
     const [lng, lat] = feature.geometry.coordinates;
     
-    // 創建自定義圖標
-    const markerIcon = L.divIcon({
-        className: 'custom-marker',
-        html: `<div class="marker-content">
-                ${locationIcons[item.type] || '📍'}
-                <div class="marker-title">${item.title}</div>
-              </div>`,
-        iconSize: [40, 40],
-        iconAnchor: [20, 40]
-    });
-
-    const marker = L.marker([lat, lng], {
-        icon: markerIcon
+    // 創建標記
+    const marker = L.marker([lat, lng]).addTo(AppState.map);
+    
+    // 創建標題
+    const titleOverlay = L.marker([lat, lng], {
+        icon: L.divIcon({
+            className: 'marker-title-container',
+            html: `<div class="marker-title">${item.title}</div>`,
+            iconSize: [120, 30],
+            iconAnchor: [15, 30]
+        })
     }).addTo(AppState.map);
     
     // 存儲標記引用
     AppState.markers.push(marker);
+    AppState.markers.push(titleOverlay);
     
-    // 添加懸停效果
-    marker.on('mouseover', function() {
-        this._icon.classList.add('marker-hover');
-    });
-    
-    marker.on('mouseout', function() {
-        this._icon.classList.remove('marker-hover');
-    });
-    
-    // 添加點擊事件
-    marker.on('click', () => {
+    // 事件處理
+    const elements = { marker, titleOverlay };
+    const styles = {
+        normal: { color: '#1976d2', weight: 3 },
+        highlight: { color: '#fbc02d', weight: 5 }
+    };
+
+    const clickHandler = (e) => {
+        e.originalEvent.stopPropagation(); // 防止觸發地圖的點擊事件
+        clearHighlight();
+        AppState.currentHighlight = { elements, styles };
+        titleOverlay._icon.classList.add('highlight');
         AppState.selectedLocation = item;
         showLocationDetails(item);
+    };
+    
+    const highlightHandler = () => {
+        if (!AppState.currentHighlight) {
+            titleOverlay._icon.classList.add('highlight');
+        }
+    };
+    
+    const unhighlightHandler = () => {
+        if (!AppState.currentHighlight) {
+            titleOverlay._icon.classList.remove('highlight');
+        }
+    };
+    
+    // 綁定事件
+    marker.on({
+        'click': clickHandler,
+        'mouseover': highlightHandler,
+        'mouseout': unhighlightHandler
     });
+    
+    titleOverlay.on({
+        'click': clickHandler,
+        'mouseover': highlightHandler,
+        'mouseout': unhighlightHandler
+    });
+
 }
 
 // 添加路線
 function addRoute(feature, item) {
     const coordinates = convertCoordinates(feature.geometry.coordinates);
+    
+    // 創建路線
     const polyline = L.polyline(coordinates, {
         color: '#1976d2',
         weight: 3,
         opacity: 0.7
     }).addTo(AppState.map);
     
-    // 存儲路線引用
-    AppState.routes.push(polyline);
+    // 計算路線中點
+    const midpointIndex = Math.floor(coordinates.length / 2);
+    const midpoint = coordinates[midpointIndex];
     
-    // 添加點擊事件
-    polyline.on('click', () => {
+    // 創建標題
+    const titleOverlay = L.marker(midpoint, {
+        icon: L.divIcon({
+            className: 'marker-title-container',
+            html: `<div class="marker-title">${item.title}</div>`,
+            iconSize: [120, 30],
+            iconAnchor: [60, 30]
+        })
+    }).addTo(AppState.map);
+    
+    // 存儲路線和標題引用
+    AppState.routes.push(polyline);
+    AppState.markers.push(titleOverlay);
+    
+    // 事件處理
+    const elements = { polyline, titleOverlay };
+    const styles = {
+        normal: { color: '#1976d2', weight: 3 },
+        highlight: { color: '#fbc02d', weight: 5 }
+    };
+
+    const clickHandler = (e) => {
+        e.originalEvent.stopPropagation(); // 防止觸發地圖的點擊事件
+        clearHighlight();
+        AppState.currentHighlight = { elements, styles };
+        titleOverlay._icon.classList.add('highlight');
+        polyline.setStyle(styles.highlight);
         AppState.selectedLocation = item;
         showLocationDetails(item);
+    };
+    
+    const highlightHandler = () => {
+        if (!AppState.currentHighlight) {
+            titleOverlay._icon.classList.add('highlight');
+            polyline.setStyle(styles.highlight);
+        }
+    };
+    
+    const unhighlightHandler = () => {
+        if (!AppState.currentHighlight) {
+            titleOverlay._icon.classList.remove('highlight');
+            polyline.setStyle(styles.normal);
+        }
+    };
+    
+    // 綁定事件
+    polyline.on({
+        'click': clickHandler,
+        'mouseover': highlightHandler,
+        'mouseout': unhighlightHandler
+    });
+    
+    titleOverlay.on({
+        'click': clickHandler,
+        'mouseover': highlightHandler,
+        'mouseout': unhighlightHandler
     });
 }
 
