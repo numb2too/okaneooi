@@ -1,0 +1,59 @@
+/* 基礎重置和共用樣式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft JhengHei', sans-serif;
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* 主視圖容器 */
+#views {
+    height: calc(100vh - 120px);
+    margin-top: 60px;
+    overflow: hidden;
+}
+
+.view {
+    display: none;
+    height: 100%;
+    width: 100%;
+}
+
+.view.active {
+    display: block;
+}
+
+/* 底部導航 */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.nav-btn {
+    border: none;
+    background: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    color: #666;
+}
+
+.nav-btn.active {
+    color: #1976d2;
+    font-weight: bold;
+}

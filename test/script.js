@@ -121,13 +121,40 @@ const markerClusterGroup = L.markerClusterGroup({
     maxClusterRadius: 40,
     animate: true,
     animateAddingMarkers: false
-});
+});// Define line styles based on level
+const lineStyles = {
+    5: { color: '#fbc02d', weight: 4, opacity: 0.8 },
+    4: { color: '#9E9E9E', weight: 3, opacity: 0.8 },
+    3: { color: '#CD7F32', weight: 2, opacity: 0.8 },
+    2: { color: '#2196F3', weight: 2, opacity: 0.8 },
+    1: { color: '#4CAF50', weight: 2, opacity: 0.8 }
+};
 
 data.forEach(item => {
     if (item.geoJson && item.geoJson.features) {
         item.geoJson.features.forEach(feature => {
+            // Validate the feature has geometry and coordinates
+            if (!feature.geometry || !feature.geometry.coordinates) {
+                console.warn('Invalid feature geometry:', feature);
+                return;
+            }
+
             if (feature.geometry.type === 'Point') {
-                const [lng, lat] = feature.geometry.coordinates;
+                // Existing Point handling code
+                const coordinates = feature.geometry.coordinates;
+                
+                if (!Array.isArray(coordinates) || coordinates.length < 2 || 
+                    !isFinite(coordinates[0]) || !isFinite(coordinates[1])) {
+                    console.warn('Invalid coordinates:', coordinates);
+                    return;
+                }
+
+                const [lng, lat] = coordinates;
+
+                if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+                    console.warn('Coordinates out of range:', { lat, lng });
+                    return;
+                }
 
                 const levelStyle = levelStyles[item.level] || levelStyles[1];
                 const markerIcon = L.divIcon({
@@ -146,63 +173,96 @@ data.forEach(item => {
                     popupAnchor: [0, -34]
                 });
 
-                const marker = L.marker([lat, lng], {
-                    icon: markerIcon
-                });
+                try {
+                    const marker = L.marker([lat, lng], {
+                        icon: markerIcon
+                    });
 
-                // Get the first image URL if available
-                const imageUrl = item.images && item.images.length > 0 ? item.images[0].url : '';
+                    // ... rest of the marker code ...
+                    const imageUrl = item.images && item.images.length > 0 ? item.images[0].url : '';
+                    const googleMapUrl = item.googleUrls && item.googleUrls.length > 0 ? item.googleUrls[0].url : '';
+                    const address = item.googleUrls && item.googleUrls.length > 0 ? item.googleUrls[0].addrName : '';
 
-                // Get Google Maps URL
-                const googleMapUrl = item.googleUrls && item.googleUrls.length > 0 ? item.googleUrls[0].url : '';
-                const address = item.googleUrls && item.googleUrls.length > 0 ? item.googleUrls[0].addrName : '';
+                    const popupContent = `
+                        <div class="map-popup level-${item.level}" style="cursor: pointer;" onclick="highlightCard('${item.uid}')">
+                            ${imageUrl ? `<img src="${imageUrl}" alt="${item.title}">` : ''}
+                            <h3>${item.title}</h3>
+                            <p>${address}</p>
+                            ${item.level === 5 ? '<div class="level-badge">⭐ 推薦</div>' : ''}
+                        </div>
+                    `;
 
-                const popupContent = `
+                    const popup = L.popup({
+                        closeButton: true,
+                        className: `custom-popup level-${item.level}`,
+                        autoPan: false
+                    }).setContent(popupContent);
+
+                    marker.bindPopup(popup);
+                    markers[item.uid] = marker;
+                    markerClusterGroup.addLayer(marker);
+                } catch (error) {
+                    console.error('Error creating marker:', { lat, lng }, error);
+                }
+            } else if (feature.geometry.type === 'LineString') {
+                // Handle LineString geometry
+                const coordinates = feature.geometry.coordinates;
+                
+                // Validate coordinates array
+                if (!Array.isArray(coordinates) || coordinates.length < 2) {
+                    console.warn('Invalid LineString coordinates:', coordinates);
+                    return;
+                }
+
+                // Convert coordinates from [lng, lat] to [lat, lng] for Leaflet
+                const latLngs = coordinates.map(coord => {
+                    if (!Array.isArray(coord) || coord.length < 2 || 
+                        !isFinite(coord[0]) || !isFinite(coord[1])) {
+                        console.warn('Invalid coordinate in LineString:', coord);
+                        return null;
+                    }
+                    return [coord[1], coord[0]]; // Convert [lng, lat] to [lat, lng]
+                }).filter(coord => coord !== null);
+
+                if (latLngs.length < 2) {
+                    console.warn('Not enough valid coordinates for LineString');
+                    return;
+                }
+
+                try {
+                    // Create polyline with style based on level
+                    const lineStyle = lineStyles[item.level] || lineStyles[1];
+                    const polyline = L.polyline(latLngs, lineStyle);
+                    const imageUrl = item.images && item.images.length > 0 ? item.images[0].url : '';
+
+                    // Add popup to the polyline
+                    const popupContent = `
                     <div class="map-popup level-${item.level}" style="cursor: pointer;" onclick="highlightCard('${item.uid}')">
                         ${imageUrl ? `<img src="${imageUrl}" alt="${item.title}">` : ''}
                         <h3>${item.title}</h3>
-                        <p>${address}</p>
                         ${item.level === 5 ? '<div class="level-badge">⭐ 推薦</div>' : ''}
                     </div>
                 `;
 
-                const popup = L.popup({
-                    closeButton: true,
-                    className: `custom-popup level-${item.level}`,
-                    autoPan: false
-                }).setContent(popupContent);
+                    const popup = L.popup({
+                        closeButton: true,
+                        className: `custom-popup level-${item.level}`,
+                        autoPan: false
+                    }).setContent(popupContent);
 
-                marker.bindPopup(popup);
-                markers[item.uid] = marker;
+                    polyline.bindPopup(popup);
 
-                marker.on('click', () => {
-                    highlightCard2(item.uid);
+                    // Store the polyline reference and add it to the map
+                    markers[item.uid] = polyline;
+                    polyline.addTo(map);
 
-                    if (markerClusterGroup.hasLayer(marker)) {
-                        markerClusterGroup.zoomToShowLayer(marker, () => {
-                            map.setView(marker.getLatLng(), 18, {
-                                animate: true,
-                                duration: 0.5,
-                                noMoveStart: true
-                            });
-                            marker.openPopup();
-                        });
-                    } else {
-                        map.setView(marker.getLatLng(), 18, {
-                            animate: true,
-                            duration: 0.5,
-                            noMoveStart: true
-                        });
-                        marker.openPopup();
-                    }
-                });
-
-                markerClusterGroup.addLayer(marker);
+                } catch (error) {
+                    console.error('Error creating polyline:', error);
+                }
             }
         });
     }
 });
-
 map.addLayer(markerClusterGroup);
 
 // 高亮顯示對應的卡片

@@ -1,0 +1,68 @@
+/* 地圖容器樣式 */
+#map {
+    height: 100%;
+    width: 100%;
+}
+
+/* 地圖標題覆蓋層 */
+.map-title-overlay {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 15px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin: 10px;
+}
+
+.map-title {
+    text-align: center;
+}
+
+.map-title h2 {
+    margin: 0;
+    font-size: 1.2em;
+    color: #1976d2;
+}
+
+/* 自定義標記樣式 */
+.custom-marker {
+    background: none;
+    border: none;
+}
+
+.marker-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.marker-title {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    margin-top: 4px;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.marker-hover {
+    transform: scale(1.1);
+}
+
+/* 自定義縮放控制樣式 */
+.leaflet-control-zoom {
+    margin-bottom: 70px !important;
+}
+
+/* 路線樣式 */
+.bike-route {
+    stroke: #1976d2;
+    stroke-width: 3;
+    stroke-opacity: 0.7;
+}
