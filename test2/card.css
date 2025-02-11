@@ -52,3 +52,23 @@
 .level {
     color: #fbc02d;
 }
+
+.title-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.map-button {
+    padding: 4px 8px;
+    border: none;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+}
+
+.map-button:hover {
+    background-color: #e0e0e0;
+}

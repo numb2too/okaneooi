@@ -35,8 +35,12 @@ function handleSearchAndFilter(query) {
             url.addrName = url.addrName.toLowerCase();
             return url.addrName.toLowerCase().includes(query)
         });
+        const tagMatch = item.tags.some(tag =>{
+            tag.name = tag.name.toLowerCase();
+            return tag.name.toLowerCase().includes(query)
+        });
         
-        return (titleMatch || addressMatch) ;
+        return (titleMatch || addressMatch||tagMatch) ;
     });
 
     // Update AppState
@@ -44,6 +48,15 @@ function handleSearchAndFilter(query) {
 
     // Update map visibility
     addMapFeatures(filteredData);
+    
+   // Check if filteredData exists and has the correct structure
+if (filteredData && filteredData[0] && filteredData[0].geoJson && filteredData[0].geoJson.features) {
+    const feature = filteredData[0].geoJson.features[0];
+    if (feature && feature.geometry && feature.geometry.coordinates) {
+        const [lng, lat] = feature.geometry.coordinates;  // GeoJSON uses [longitude, latitude]
+        AppState.map.flyTo([lat, lng], 15, { duration: 0.5 });
+    }
+}
 
     // Update card view if needed
     if (typeof updateCardView === 'function') {
