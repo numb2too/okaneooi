@@ -82,12 +82,17 @@ function addMarker(feature, item) {
         clearHighlight();
         AppState.currentHighlight = { elements, styles };
         titleOverlay._icon.classList.add('highlight');
-    
+            // 記錄當前位置
+    lastLatLng = e.latlng;
+      // 設定地圖視角，放大至 15 級（可根據需求調整）
+      AppState.map.flyTo(e.latlng, 18, { duration: 0.5 });
         // 顯示簡單資訊
         showSimpleInfoPopup(item, (clickedItem) => {
             // 這個 callback 在縮圖點擊後執行
             showLocationDetails(clickedItem);
         });
+          // 顯示懸浮按鈕
+    document.getElementById('resetViewBtn').style.display = 'block';
     };
 
 
@@ -183,10 +188,14 @@ function addRoute(feature, item) {
         titleOverlay._icon.classList.add('highlight');
         polyline.setStyle(styles.highlight);
 
+      // 設定地圖視角，放大至 15 級（可根據需求調整）
+      AppState.map.flyTo(e.latlng, 13, { duration: 0.5 });
         // 顯示簡易資訊
         showSimpleInfoPopupAt(e.latlng, item, (clickedItem) => {
             showLocationDetails(clickedItem);
         });
+          // 顯示懸浮按鈕
+    document.getElementById('resetViewBtn').style.display = 'block';
     };
     
     const highlightHandler = () => {
@@ -256,3 +265,16 @@ function clearMapFeatures() {
 
 // 地圖功能初始化
 document.addEventListener('DOMContentLoaded', initMap);
+
+
+// 設定預設縮放等級（請根據實際情況調整）
+const DEFAULT_ZOOM = 11;
+let lastLatLng = null;
+
+// 監聽懸浮按鈕點擊，恢復原本縮放大小
+document.getElementById('resetViewBtn').addEventListener('click', () => {
+    if (lastLatLng) {
+        AppState.map.flyTo(lastLatLng, DEFAULT_ZOOM, { duration: 0.5 });
+    }
+    document.getElementById('resetViewBtn').style.display = 'none'; // 隱藏按鈕
+});
