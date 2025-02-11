@@ -54,16 +54,61 @@ function createDetailContent(item) {
         const imagesContainer = document.createElement('div');
         imagesContainer.className = 'images-container';
         
-        item.images.forEach(image => {
-            if (image.type === 'pic') {
-                const img = document.createElement('img');
-                img.src = image.url;
-                img.className = 'preview-image';
-                img.alt = item.title;
-                imagesContainer.appendChild(img);
-            }
-        });
+        // 創建圖片滾動容器
+        const imagesScroll = document.createElement('div');
+        imagesScroll.className = 'images-scroll';
         
+        // 篩選出圖片類型
+        const pictures = item.images.filter(image => image.type === 'pic');
+        
+        pictures.forEach(image => {
+            const img = document.createElement('img');
+            img.src = image.url;
+            img.className = 'preview-image';
+            img.alt = item.title;
+            imagesScroll.appendChild(img);
+        });
+
+        // 只有在有多張圖片時才添加箭頭
+        if (pictures.length > 1) {
+            // 添加左右箭頭
+            const leftArrow = document.createElement('button');
+            leftArrow.className = 'scroll-arrow left hidden';
+            leftArrow.innerHTML = '&#10094;';
+            
+            const rightArrow = document.createElement('button');
+            rightArrow.className = 'scroll-arrow right';
+            rightArrow.innerHTML = '&#10095;';
+            
+            // 添加滾動事件監聽
+            imagesScroll.addEventListener('scroll', () => {
+                const isAtStart = imagesScroll.scrollLeft <= 0;
+                const isAtEnd = imagesScroll.scrollLeft + imagesScroll.clientWidth >= imagesScroll.scrollWidth;
+                
+                leftArrow.classList.toggle('hidden', isAtStart);
+                rightArrow.classList.toggle('hidden', isAtEnd);
+            });
+            
+            // 添加箭頭點擊事件
+            leftArrow.addEventListener('click', () => {
+                imagesScroll.scrollBy({
+                    left: -300,
+                    behavior: 'smooth'
+                });
+            });
+            
+            rightArrow.addEventListener('click', () => {
+                imagesScroll.scrollBy({
+                    left: 300,
+                    behavior: 'smooth'
+                });
+            });
+            
+            imagesContainer.appendChild(leftArrow);
+            imagesContainer.appendChild(rightArrow);
+        }
+        
+        imagesContainer.appendChild(imagesScroll);
         content.appendChild(imagesContainer);
     }
 
@@ -121,48 +166,7 @@ function createDetailContent(item) {
     }
 
     // 添加社群媒體連結和嵌入內容
-    if (item.socialUrls && item.socialUrls.length > 0) {
-        const socialSection = document.createElement('div');
-        socialSection.className = 'social-section';
-
-        // 社群媒體連結
-        const linksDiv = document.createElement('div');
-        linksDiv.className = 'social-links';
-
-        item.socialUrls.forEach(social => {
-            // 創建連結
-            const link = document.createElement('a');
-            link.href = social.url;
-            link.target = '_blank';
-            link.className = `social-btn ${social.type}`;
-            link.textContent = `${socialIcons[social.type] || '🔗'} ${
-                social.type === 'youtube' ? 'YouTube' :
-                social.type === 'shorts' ? 'Shorts' :
-                social.type === 'instagram' ? 'Instagram' : 'Link'
-            }`;
-            linksDiv.appendChild(link);
-
-            // 如果是 YouTube 影片，添加嵌入播放器
-            if (social.type === 'youtube' || social.type === 'shorts') {
-                const videoId = getYouTubeVideoId(social.url);
-                if (videoId) {
-                    const videoContainer = document.createElement('div');
-                    videoContainer.className = 'video-container';
-                    videoContainer.innerHTML = `
-                        <iframe 
-                            src="https://www.youtube.com/embed/${videoId}" 
-                            title="YouTube video player" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen>
-                        </iframe>`;
-                    socialSection.appendChild(videoContainer);
-                }
-            }
-        });
-
-        socialSection.appendChild(linksDiv);
-        content.appendChild(socialSection);
-    }
+    updateSocialContent(content,item)
 
     // 添加建立時間
     const timeDiv = document.createElement('div');
@@ -171,6 +175,93 @@ function createDetailContent(item) {
     content.appendChild(timeDiv);
 
     return content;
+}
+
+function updateSocialContent(content,item) {
+    if (item.socialUrls && item.socialUrls.length > 0) {
+        const socialContent = createSocialSection(item.socialUrls);
+        content.appendChild(socialContent);
+    }
+}
+
+// 創建社群媒體區塊
+function createSocialSection(socialUrls) {
+    const socialSection = document.createElement('div');
+    socialSection.className = 'social-section';
+
+    const videoGrid = document.createElement('div');
+    videoGrid.className = 'video-grid';
+
+    const linksDiv = document.createElement('div');
+    linksDiv.className = 'social-links';
+
+    socialUrls.forEach(social => {
+        if (social.type === 'youtube' || social.type === 'shorts') {
+            const videoId = getYouTubeVideoId(social.url);
+            if (videoId) {
+                const thumbnail = document.createElement('div');
+                thumbnail.className = 'video-thumbnail';
+                thumbnail.onclick = () => window.open(social.url, '_blank');
+
+                thumbnail.innerHTML = `
+                    <img src="https://img.youtube.com/vi/${videoId}/maxresdefault.jpg" 
+                         onerror="this.src='https://img.youtube.com/vi/${videoId}/hqdefault.jpg'"
+                         alt="YouTube Thumbnail">
+                    <div class="play-icon">▶</div>
+                `;
+                videoGrid.appendChild(thumbnail);
+            }
+        } else {
+            // 處理其他社群媒體連結
+            const link = document.createElement('a');
+            link.href = social.url;
+            link.target = '_blank';
+            link.className = 'social-link';
+            
+            // 根據類型設置圖標和文字
+            const icon = socialIcons[social.type] || '🔗';
+            const text = social.title || social.type;
+            
+            link.innerHTML = `
+                <span class="icon">${icon}</span>
+                <span>${text}</span>
+            `;
+            linksDiv.appendChild(link);
+        }
+    });
+
+    if (videoGrid.children.length > 0) {
+        socialSection.appendChild(videoGrid);
+    }
+    if (linksDiv.children.length > 0) {
+        socialSection.appendChild(linksDiv);
+    }
+
+    return socialSection;
+}
+
+// 獲取 YouTube 影片 ID
+function getYouTubeVideoId(url) {
+    try {
+        const urlObj = new URL(url);
+         // 處理 YouTube Shorts 網址
+          if (urlObj.pathname.includes('/shorts/')) {
+            return urlObj.pathname.split('/shorts/')[1];
+        }
+        // 處理一般 YouTube 網址
+        else if (urlObj.hostname.includes('youtube.com')) {
+            const searchParams = new URLSearchParams(urlObj.search);
+            return searchParams.get('v');
+        }
+       
+        // 處理 youtu.be 短網址
+        else if (urlObj.hostname === 'youtu.be') {
+            return urlObj.pathname.slice(1);
+        }
+    } catch (e) {
+        console.error('Invalid URL:', url);
+    }
+    return null;
 }
 
 // 初始化模態框功能

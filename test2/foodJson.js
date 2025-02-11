@@ -1397,7 +1397,7 @@ const foodData = [
         },
         "socialUrls": [
             {
-                "type": "intagram",
+                "type": "instagram",
                 "title": "",
                 "url": "https://www.instagram.com/p/C8rI0RgSaVA/"
             }
