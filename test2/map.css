@@ -11,9 +11,8 @@
 }
 /* 標記圖標的基本樣式 */
 .leaflet-marker-icon {
-    transition: filter 0.2s ease;
+    transition: all 0.2s ease;
 }
-
 /* 高亮標記圖標 */
 .leaflet-marker-icon.highlight {
     filter: hue-rotate(45deg) brightness(1.2);
@@ -21,7 +20,7 @@
 
 /* 或者如果你想要更明顯的變化，可以使用這個替代方案：*/
 .leaflet-marker-icon.highlight {
-    filter: drop-shadow(0 0 5px #1976d2);
+    filter: drop-shadow(0 0 5px #7955e4);
 }
 
 /* 標記標題樣式 */
@@ -31,24 +30,24 @@
     margin-left: 30px;
     line-height: 24px;
     white-space: nowrap;
-    color: #000000;
+    color: #1976d2;
     text-shadow: 
         -1px -1px 0 #fff,  
          1px -1px 0 #fff,
         -1px  1px 0 #fff,
          1px  1px 0 #fff;
     font-weight: bold;
-    transition: color 0.2s ease;
+    transition: all 0.2s ease;
 }
 
-/* 高亮標題 */
+
 .highlight .marker-title {
-    color: #1976d2;
+    color: #8d2ce9;
 }
 
 /* 高亮路線 */
 .leaflet-interactive:hover {
-    stroke: #fbc02d !important;
+    stroke: #634ce3 !important;
     stroke-width: 5 !important;
 }
 
