@@ -149,7 +149,7 @@ function showSimpleInfoPopup(item, onThumbnailClick) {
 
     // 設定 Leaflet 彈窗
     const popup = L.popup({
-        offset: [0, -40],
+        offset: [0, 0],
         closeButton: false,
         className: 'custom-popup' // 添加自訂類別以便設定樣式
     })
@@ -166,14 +166,21 @@ function showSimpleInfoPopup(item, onThumbnailClick) {
 function addMarker(feature, item) {
     const [lng, lat] = feature.geometry.coordinates;
     
-    const marker = L.marker([lat, lng]).addTo(AppState.map);
-    
+     // 建立小型標記
+     const marker = L.marker([lat, lng], {
+        icon: L.divIcon({
+            className: 'custom-marker',
+            html: '<div class="marker-dot"></div>',
+            iconSize: [16, 16],
+            iconAnchor: [4, 4]
+        })
+    }).addTo(AppState.map);
     const titleOverlay = L.marker([lat, lng], {
         icon: L.divIcon({
             className: 'marker-title-container',
             html: `<div class="marker-title">${item.title}</div>`,
             iconSize: [120, 30],
-            iconAnchor: [15, 30]
+            iconAnchor: [15, 8]
         })
     }).addTo(AppState.map);
     
@@ -252,6 +259,7 @@ function addRoute(feature, item) {
         AppState.currentHighlight = { elements };
         applyHighlight(elements, true);
 
+        lastLatLng = e.latlng;
         AppState.map.flyTo(e.latlng, 13, { duration: 0.5 });
         showSimpleInfoPopupAt(e.latlng, item, (clickedItem) => {
             showLocationDetails(clickedItem);
@@ -298,7 +306,7 @@ function showSimpleInfoPopupAt(latlng, item, onThumbnailClick) {
     });
 
     // 設定 Leaflet 彈窗，並將它放在 `latlng`
-    const popup = L.popup({ offset: [0, -40], closeButton: false })
+    const popup = L.popup({ offset: [0, -16], closeButton: false })
         .setLatLng(latlng) // 這裡使用 `latlng`，確保點擊的地方顯示彈窗
         .setContent(popupContent)
         .openOn(AppState.map);

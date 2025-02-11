@@ -227,3 +227,23 @@
 .location-button:active {
     background-color: #e6e6e6 !important;
 }
+
+
+.custom-marker {
+    background: none;
+    border: none;
+}
+
+.marker-dot {
+    width: 16px;
+    height: 16px;
+    background-color: #1976d2;
+    border-radius: 50%;
+    border: 1px solid white;
+    box-shadow: 0 0 2px rgba(0,0,0,0.3);
+}
+
+.highlight .marker-dot {
+    background-color: #7955e4;
+    transform: scale(1.2);
+}
