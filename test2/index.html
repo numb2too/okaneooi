@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,19 +14,45 @@
     <link rel="stylesheet" href="map.css">
     <link rel="stylesheet" href="card.css">
     <link rel="stylesheet" href="modal.css">
+    <link rel="stylesheet" href="search.css">
+
 </head>
+
 <body>
     <!-- 標題區塊 -->
     <header class="top-header">
         <h1 id="mainTitle">屋拎人生地圖</h1>
     </header>
 
+    <div class="search-section">
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="搜尋地點或地址...">
+                <button class="search-clear" style="display: none;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="tag-buttons">
+                <button class="tag-btn food-tag" data-type="food">
+                    <i class="fas fa-utensils"></i>
+                    <span>美食</span>
+                </button>
+                <button class="tag-btn route-tag" data-type="route">
+                    <i class="fas fa-route"></i>
+                    <span>路線</span>
+                </button>
+            </div>
+        </div>
+        <div class="search-results" style="display: none;"></div>
+    </div>
+
     <!-- 主要視圖 -->
     <div id="views">
         <div id="map-view" class="view active">
             <div id="map"></div>
-            
-    <button id="resetViewBtn" class="floating-btn" style="display: none;">重置視角</button>
+
+            <button id="resetViewBtn" class="floating-btn" style="display: none;">重置視角</button>
         </div>
         <div id="card-view" class="view">
             <div class="card-container"></div>
@@ -58,7 +85,7 @@
                 <h2>關於屋拎人生地圖</h2>
                 <p>探索生活中的美好時刻，記錄每一個值得分享的地方。</p>
                 <p>跟著我們一起發現在地美食、景點，和精彩的自行車路線！</p>
-                
+
                 <div class="social-links">
                     <a href="https://youtube.com/@OurLifeMap" target="_blank" class="social-btn youtube">
                         📺 YouTube
@@ -89,5 +116,7 @@
     <script src="map.js"></script>
     <script src="card.js"></script>
     <script src="modal.js"></script>
+    <script src="search.js"></script>
 </body>
+
 </html>
