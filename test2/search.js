@@ -69,7 +69,7 @@ if (filteredData && filteredData[0] && filteredData[0].geoJson && filteredData[0
 // 新增：重置地圖到預設狀態的函數
 
 function resetMapToDefault() {
-    AppState.filteredData = null;
+    AppState.filteredData = foodData;
     
     addMapFeatures(foodData);
     // Update card view if needed

@@ -17,6 +17,9 @@ function initMap() {
     // 添加所有標記和路線
     addMapFeatures(foodData);
 
+    AppState.filteredData = foodData;
+
+
 
     // 初始化定位按鈕
     initLocationButton();
@@ -416,6 +419,93 @@ document.getElementById('resetViewBtn').addEventListener('click', () => {
     document.querySelector('#map').click();
 });
 
+// 隨機選擇地標並飛過去
+function randomLocation() {
+    // 確保有可用的資料
+    if (!AppState.filteredData || AppState.filteredData.length === 0) {
+        alert('沒有可用的地標資料');
+        return;
+    }
+
+    // 確保在地圖視圖
+    const mapViewButton = document.querySelector('[data-view="map-view"]');
+    if (mapViewButton) {
+        mapViewButton.click();
+    }
+
+    // 新增載入動畫
+    const randomViewBtn = document.getElementById('randomViewBtn');
+    if (randomViewBtn) {
+        randomViewBtn.disabled = true;
+        randomViewBtn.innerHTML = '🎲 隨機搜尋中...';
+    }
+
+    // 找到有效的地標
+    let validItems = AppState.filteredData.filter(item => 
+        item.geoJson && 
+        item.geoJson.features && 
+        item.geoJson.features[0] && 
+        item.geoJson.features[0].geometry
+    );
+
+    if (validItems.length === 0) {
+        alert('沒有有效的地標資料');
+        if (randomViewBtn) {
+            randomViewBtn.disabled = false;
+            randomViewBtn.innerHTML = '🎲';
+        }
+        return;
+    }
+
+
+    // 如果只有一個有效項目，直接回傳
+    if (validItems.length === 1) {
+        if (randomViewBtn) {
+            randomViewBtn.disabled = false;
+            randomViewBtn.innerHTML = '🎲';
+        }
+        return;
+    }
+
+    // 排除當前項目
+    if (AppState.currentItemIndex !== undefined && AppState.currentItemIndex >= 0) {
+        validItems = validItems.filter((item, index) => index !== AppState.currentItemIndex);
+    }
+
+    // 隨機選擇一個地標
+    const randomIndex = Math.floor(Math.random() * validItems.length);
+    const item = validItems[randomIndex];
+    
+    // 更新當前索引
+    AppState.currentItemIndex = AppState.filteredData.findIndex(i => i === item);
+
+    // 延遲執行以確保地圖視圖已完全載入
+    setTimeout(() => {
+        flyToLocation(item);
+
+        // 重設按鈕狀態
+        if (randomViewBtn) {
+            randomViewBtn.disabled = false;
+            randomViewBtn.innerHTML = '🎲';
+        }
+    }, 300);
+}
+
+// 監聽隨機查看按鈕點擊事件
+document.getElementById('randomViewBtn').addEventListener('click', randomLocation);
+// 監聽下一個地圖按鈕點擊事件
+document.getElementById('nextViewBtn').addEventListener('click', navigateToNextLocation);
+
+// 新增鍵盤快捷鍵
+document.addEventListener('keydown', (event) => {
+    // 按空白鍵觸發隨機查看 (確保不是在輸入框中)
+    if (event.code === 'Space' && 
+        !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        event.preventDefault();
+        randomLocation();
+    }
+});
+
 
 
 // 初始化定位按鈕
@@ -566,3 +656,69 @@ function initLocationButton() {
     // 添加定位按鈕到地圖
     new L.Control.LocationButton().addTo(AppState.map);
 }
+
+
+// 跳到下一個地標
+function navigateToNextLocation() {
+    // 確保有可用的資料
+    if (!AppState.filteredData || AppState.filteredData.length === 0) {
+        console.warn('沒有可用的地標資料');
+        return;
+    }
+
+    // 確保在地圖視圖
+    const mapViewButton = document.querySelector('[data-view="map-view"]');
+    if (mapViewButton) {
+        mapViewButton.click();
+    }
+
+    // 新增載入動畫
+    const nextViewBtn = document.getElementById('nextViewBtn');
+    if (nextViewBtn) {
+        nextViewBtn.disabled = true;
+        nextViewBtn.innerHTML = '⏳ 下個地點載入中...';
+    }
+
+    // 找到有效的地標
+    let validItems = AppState.filteredData.filter(item => 
+        item.geoJson && 
+        item.geoJson.features && 
+        item.geoJson.features[0] && 
+        item.geoJson.features[0].geometry
+    );
+
+    if (validItems.length === 0) {
+        console.warn('沒有有效的地標資料');
+        if (nextViewBtn) {
+            nextViewBtn.disabled = false;
+            nextViewBtn.innerHTML = '➡️';
+        }
+        return;
+    }
+
+    // 計算下一個索引
+    AppState.currentItemIndex = (AppState.currentItemIndex + 1) % validItems.length;
+    const nextItem = validItems[AppState.currentItemIndex];
+
+    // 延遲執行以確保地圖視圖已完全載入
+    setTimeout(() => {
+        flyToLocation(nextItem);
+
+        // 重設按鈕狀態
+        if (nextViewBtn) {
+            nextViewBtn.disabled = false;
+            nextViewBtn.innerHTML = '➡️';
+        }
+    }, 300);
+}
+
+
+// 監聽鍵盤事件
+document.addEventListener('keydown', (event) => {
+    // 按 N 鍵觸發下一個 (確保不是在輸入框中)
+    if (event.key.toLowerCase() === 'n' && 
+        !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        event.preventDefault();
+        navigateToNextLocation();
+    }
+});

@@ -104,15 +104,13 @@ function createLocationCard(item) {
 
 // 跳轉到地圖位置的函數
 // 跳轉到地圖位置的函數
-function flyToLocation(item, highlightPolyline) {
+function flyToLocation(item) {
     if (item.geoJson && item.geoJson.features) {
         const feature = item.geoJson.features[0];
         if (feature && feature.geometry && feature.geometry.coordinates) {
             if (feature.geometry.type === 'LineString') {
                 // 路線的處理
                 const coordinates = convertCoordinates(feature.geometry.coordinates);
-                highlightPolyline = L.polyline(coordinates, HIGHLIGHT_STYLES.normal.route).addTo(AppState.map);
-                
                 // 計算路線中點
                 const midpointIndex = Math.floor(coordinates.length / 2);
                 const midpoint = coordinates[midpointIndex];

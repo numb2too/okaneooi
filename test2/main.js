@@ -10,6 +10,7 @@ const AppState = {
         routes: [],
         titles: []
     },
+    currentItemIndex: -1,
     filteredData: null  // 新增：追踪當前過濾後的資料
 };
 
