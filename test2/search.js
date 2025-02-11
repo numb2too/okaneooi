@@ -4,58 +4,39 @@ function initSearch() {
     const clearButton = document.querySelector('.search-clear');
     const tagButtons = document.querySelectorAll('.tag-btn');
     
-    let activeFilters = new Set();
-
-    // Tag button click handler
-    tagButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const type = btn.dataset.type;
-            btn.classList.toggle('active');
-            
-            if (btn.classList.contains('active')) {
-                activeFilters.add(type);
-            } else {
-                activeFilters.delete(type);
-            }
-            
-            const query = searchInput.value.toLowerCase().trim();
-            handleSearchAndFilter(query, activeFilters);
-        });
-    });
 
     // Search input handler with debounce
     searchInput.addEventListener('input', debounce((e) => {
         const query = e.target.value.toLowerCase().trim();
         clearButton.style.display = query ? 'flex' : 'none';
         
-        if (!query && activeFilters.size === 0) {
+        if (!query) {
             resetMapToDefault();
             return;
         }
 
-        handleSearchAndFilter(query, activeFilters);
+        handleSearchAndFilter(query);
     }, 300));
 
     // Clear button handler
     clearButton.addEventListener('click', () => {
         searchInput.value = '';
         clearButton.style.display = 'none';
-        activeFilters.clear();
         tagButtons.forEach(btn => btn.classList.remove('active'));
         resetMapToDefault();
     });
 }
 
-function handleSearchAndFilter(query, activeFilters) {
+function handleSearchAndFilter(query) {
     // Filter the data based on search query and active filters
     const filteredData = foodData.filter(item => {
-        const titleMatch = item.title.toLowerCase().includes(query.toLowerCase());
-        const addressMatch = item.googleUrls[0].addrName.toLowerCase().includes(query.toLowerCase());
-        const matchesFilter = activeFilters.size === 0 || 
-            (activeFilters.has('food') && !item.isRoute) ||
-            (activeFilters.has('route') && item.isRoute);
+        const titleMatch = item.title.toLowerCase().includes(query.toLowerCase());           
+        const addressMatch = item.googleUrls.some(url =>{
+            url.addrName = url.addrName.toLowerCase();
+            return url.addrName.toLowerCase().includes(query)
+        });
         
-        return (titleMatch || addressMatch) && matchesFilter;
+        return (titleMatch || addressMatch) ;
     });
 
     // Update AppState
@@ -76,9 +57,6 @@ function handleSearchAndFilter(query, activeFilters) {
 
 function resetMapToDefault() {
     AppState.filteredData = null;
-    
-    const allCoords = [];
-    
     
     addMapFeatures(foodData);
     // Update card view if needed
