@@ -82,9 +82,15 @@ function addMarker(feature, item) {
         clearHighlight();
         AppState.currentHighlight = { elements, styles };
         titleOverlay._icon.classList.add('highlight');
-        AppState.selectedLocation = item;
-        showLocationDetails(item);
+    
+        // 顯示簡單資訊
+        showSimpleInfoPopup(item, (clickedItem) => {
+            // 這個 callback 在縮圖點擊後執行
+            showLocationDetails(clickedItem);
+        });
     };
+
+
     
     const highlightHandler = () => {
         if (!AppState.currentHighlight) {
@@ -113,7 +119,28 @@ function addMarker(feature, item) {
 
 }
 
-// 添加路線
+// 顯示簡單資訊彈窗
+function showSimpleInfoPopup(item, onThumbnailClick) {
+    // 創建簡單資訊內容
+    const popupContent = document.createElement('div');
+    popupContent.classList.add('simple-info-popup');
+    popupContent.innerHTML = `
+        <img src="${item.thumbnail}" alt="${item.title}" class="info-thumbnail">
+        <div class="info-title">${item.title}</div>
+        <div class="info-address">${item.address || '地址未知'}</div>
+    `;
+
+    // 點擊縮圖時顯示詳細資訊
+    popupContent.querySelector('.info-thumbnail').addEventListener('click', () => {
+        onThumbnailClick(item);
+    });
+
+    // 設定 Leaflet 彈窗
+    const popup = L.popup({ offset: [0, -40], closeButton: false })
+        .setLatLng([item.geoJson.features[0].geometry.coordinates[1], item.geoJson.features[0].geometry.coordinates[0]])
+        .setContent(popupContent)
+        .openOn(AppState.map);
+}
 function addRoute(feature, item) {
     const coordinates = convertCoordinates(feature.geometry.coordinates);
     
@@ -155,8 +182,11 @@ function addRoute(feature, item) {
         AppState.currentHighlight = { elements, styles };
         titleOverlay._icon.classList.add('highlight');
         polyline.setStyle(styles.highlight);
-        AppState.selectedLocation = item;
-        showLocationDetails(item);
+
+        // 顯示簡易資訊
+        showSimpleInfoPopupAt(e.latlng, item, (clickedItem) => {
+            showLocationDetails(clickedItem);
+        });
     };
     
     const highlightHandler = () => {
@@ -186,6 +216,29 @@ function addRoute(feature, item) {
         'mouseout': unhighlightHandler
     });
 }
+
+function showSimpleInfoPopupAt(latlng, item, onThumbnailClick) {
+    const popupContent = document.createElement('div');
+    popupContent.classList.add('simple-info-popup');
+    popupContent.innerHTML = `
+        <img src="${item.thumbnail}" alt="${item.title}" class="info-thumbnail">
+        <div class="info-title">${item.title}</div>
+        <div class="info-address">${item.address || '地址未知'}</div>
+    `;
+
+    // 點擊縮圖後顯示詳細資訊
+    popupContent.querySelector('.info-thumbnail').addEventListener('click', () => {
+        onThumbnailClick(item);
+    });
+
+    // 設定 Leaflet 彈窗，並將它放在 `latlng`
+    const popup = L.popup({ offset: [0, -40], closeButton: false })
+        .setLatLng(latlng) // 這裡使用 `latlng`，確保點擊的地方顯示彈窗
+        .setContent(popupContent)
+        .openOn(AppState.map);
+}
+
+
 
 // 重置地圖視圖
 function resetMapView() {
