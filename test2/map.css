@@ -114,7 +114,24 @@
     z-index: 999;
 }
 
-.next-btn:hover {
+/* 重新整理按鈕 */
+.refresh-btn {
+    position: fixed;
+    bottom: 250px;
+    right: 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 10px;
+    border-radius: 50px;
+    font-size: 14px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: 0.3s;
+    z-index: 999;
+}
+
+.refresh-btn:hover {
     background-color: #0056b3;
 }
 

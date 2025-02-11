@@ -495,6 +495,8 @@ function randomLocation() {
 document.getElementById('randomViewBtn').addEventListener('click', randomLocation);
 // 監聽下一個地圖按鈕點擊事件
 document.getElementById('nextViewBtn').addEventListener('click', navigateToNextLocation);
+// 監聽重新整理按鈕點擊事件
+document.getElementById('refreshBtn').addEventListener('click', refreshPage);
 
 // 新增鍵盤快捷鍵
 document.addEventListener('keydown', (event) => {
@@ -720,5 +722,30 @@ document.addEventListener('keydown', (event) => {
         !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
         event.preventDefault();
         navigateToNextLocation();
+    }
+});
+
+
+// 重新整理頁面功能
+function refreshPage() {
+    const refreshBtn = document.getElementById('refreshBtn');
+    if (refreshBtn) {
+        refreshBtn.disabled = true;
+        refreshBtn.innerHTML = '🔄 重新整理中...';
+    }
+
+    // 延遲一下下讓使用者看到按鈕狀態變化
+    setTimeout(() => {
+        window.location.reload();
+    }, 100);
+}
+
+// 監聽鍵盤事件
+document.addEventListener('keydown', (event) => {
+    // 按 R 鍵觸發重新整理 (確保不是在輸入框中)
+    if (event.key.toLowerCase() === 'r' && 
+        !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        event.preventDefault();
+        refreshPage();
     }
 });
