@@ -116,27 +116,46 @@ function addMapFeatures() {
 
 // 顯示簡單資訊彈窗
 function showSimpleInfoPopup(item, onThumbnailClick) {
-    // 創建簡單資訊內容
     const popupContent = document.createElement('div');
     popupContent.classList.add('simple-info-popup');
+    
+    // 使用更結構化的 HTML
     popupContent.innerHTML = `
-        <img src="${item.images[0].url}" alt="${item.title}" class="info-thumbnail">
-        <div class="info-title">${item.title}</div>
-        <div class="info-address">${item.googleUrls[0].addrName || '地址未知'}</div>
+        <div class="popup-container">
+            <div class="popup-image-container">
+                <img src="${item.images[0].url}" alt="${item.title}" class="info-thumbnail">
+                <div class="image-overlay">
+                    <span class="click-hint">點擊查看更多</span>
+                </div>
+            </div>
+            <div class="popup-content">
+                <h3 class="info-title">${item.title}</h3>
+                <div class="info-address">
+                    <i class="fas fa-map-marker-alt"></i>
+                    ${item.googleUrls[0].addrName || '地址未知'}
+                </div>
+            </div>
+        </div>
     `;
 
-    // 點擊縮圖時顯示詳細資訊
-    popupContent.querySelector('.info-thumbnail').addEventListener('click', () => {
+    // 點擊整個圖片容器來顯示詳細資訊
+    popupContent.querySelector('.popup-image-container').addEventListener('click', () => {
         onThumbnailClick(item);
     });
 
     // 設定 Leaflet 彈窗
-    const popup = L.popup({ offset: [0, -40], closeButton: false })
-        .setLatLng([item.geoJson.features[0].geometry.coordinates[1], item.geoJson.features[0].geometry.coordinates[0]])
+    const popup = L.popup({
+        offset: [0, -40],
+        closeButton: false,
+        className: 'custom-popup' // 添加自訂類別以便設定樣式
+    })
+        .setLatLng([
+            item.geoJson.features[0].geometry.coordinates[1],
+            item.geoJson.features[0].geometry.coordinates[0]
+        ])
         .setContent(popupContent)
         .openOn(AppState.map);
 }
-
 
 
 // 更新添加標記函數
