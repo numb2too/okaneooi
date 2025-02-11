@@ -4,7 +4,13 @@ const AppState = {
     selectedLocation: null,
     map: null,
     markers: [],
-    routes: []
+    routes: [],
+    allMapFeatures: {
+        markers: [],
+        routes: [],
+        titles: []
+    },
+    filteredData: null  // 新增：追踪當前過濾後的資料
 };
 
 // 視圖切換處理

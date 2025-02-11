@@ -1,14 +1,12 @@
-/* JavaScript 部分 (search.js) */
-// 初始化搜尋功能
+// 修改 initSearch 函數
 function initSearch() {
     const searchInput = document.querySelector('.search-input');
-    const searchResults = document.querySelector('.search-results');
     const clearButton = document.querySelector('.search-clear');
     const tagButtons = document.querySelectorAll('.tag-btn');
     
     let activeFilters = new Set();
 
-    // 標籤按鈕點擊處理
+    // Tag button click handler
     tagButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             const type = btn.dataset.type;
@@ -20,40 +18,39 @@ function initSearch() {
                 activeFilters.delete(type);
             }
             
-            if (searchInput.value) {
-                updateSearchResults(searchInput.value, activeFilters);
-            }
+            const query = searchInput.value.toLowerCase().trim();
+            handleSearchAndFilter(query, activeFilters);
         });
     });
 
-    // 搜尋輸入處理
+    // Search input handler with debounce
     searchInput.addEventListener('input', debounce((e) => {
         const query = e.target.value.toLowerCase().trim();
         clearButton.style.display = query ? 'flex' : 'none';
         
-        if (!query) {
-            searchResults.style.display = 'none';
+        if (!query && activeFilters.size === 0) {
+            resetMapToDefault();
             return;
         }
 
-        updateSearchResults(query, activeFilters);
+        handleSearchAndFilter(query, activeFilters);
     }, 300));
 
-    // 清除按鈕處理
+    // Clear button handler
     clearButton.addEventListener('click', () => {
         searchInput.value = '';
-        searchResults.style.display = 'none';
         clearButton.style.display = 'none';
+        activeFilters.clear();
+        tagButtons.forEach(btn => btn.classList.remove('active'));
+        resetMapToDefault();
     });
 }
 
-// 更新搜尋結果
-function updateSearchResults(query, activeFilters) {
-    const searchResults = document.querySelector('.search-results');
-    
-    let filteredData = foodData.filter(item => {
-        const titleMatch = item.title.toLowerCase().includes(query);
-        const addressMatch = item.googleUrls[0].addrName.toLowerCase().includes(query);
+function handleSearchAndFilter(query, activeFilters) {
+    // Filter the data based on search query and active filters
+    const filteredData = foodData.filter(item => {
+        const titleMatch = item.title.toLowerCase().includes(query.toLowerCase());
+        const addressMatch = item.googleUrls[0].addrName.toLowerCase().includes(query.toLowerCase());
         const matchesFilter = activeFilters.size === 0 || 
             (activeFilters.has('food') && !item.isRoute) ||
             (activeFilters.has('route') && item.isRoute);
@@ -61,55 +58,53 @@ function updateSearchResults(query, activeFilters) {
         return (titleMatch || addressMatch) && matchesFilter;
     });
 
-    if (filteredData.length === 0) {
-        searchResults.innerHTML = '<div class="no-results">找不到符合的結果</div>';
-    } else {
-        searchResults.innerHTML = filteredData
-            .map(item => `
-                <div class="search-result-item" data-id="${item.id}">
-                    <div class="result-icon">
-                        <i class="fas ${item.isRoute ? 'fa-route' : 'fa-utensils'}"></i>
-                    </div>
-                    <div class="result-info">
-                        <div class="result-title">${item.title}</div>
-                        <div class="result-address">
-                            <i class="fas fa-map-marker-alt"></i>
-                            ${item.googleUrls[0].addrName}
-                        </div>
-                    </div>
-                </div>
-            `)
-            .join('');
+    // Update AppState
+    AppState.filteredData = filteredData;
+
+    // Update map visibility
+    addMapFeatures(filteredData);
+
+    // Update card view if needed
+    if (typeof updateCardView === 'function') {
+        updateCardView(filteredData);
     }
 
-    searchResults.style.display = 'block';
-
-    // 添加結果點擊事件
-    searchResults.querySelectorAll('.search-result-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const selectedItem = foodData.find(
-                data => data.id === item.dataset.id
-            );
-            
-            if (selectedItem && selectedItem.geoJson.features[0]) {
-                const coords = selectedItem.geoJson.features[0].geometry.coordinates;
-                AppState.map.setView([coords[1], coords[0]], 16);
-                
-                // 找到對應的標記並觸發點擊
-                const marker = AppState.markers.find(m => 
-                    m.getLatLng().lat === coords[1] && 
-                    m.getLatLng().lng === coords[0]
-                );
-                
-                if (marker) {
-                    marker.fire('click');
-                }
-            }
-
-            searchResults.style.display = 'none';
-        });
-    });
+    return filteredData;
 }
+
+// 新增：重置地圖到預設狀態的函數
+
+function resetMapToDefault() {
+    AppState.filteredData = null;
+    
+    const allCoords = [];
+    
+    
+    addMapFeatures(foodData);
+    // Update card view if needed
+    if (typeof updateCardView === 'function') {
+        updateCardView(foodData);
+    }
+}
+
+// 更新地圖可見性// 更新地圖可見性的函數// 更新地圖可見性的函數
+function updateMapVisibility() {
+    console.log('Updating map visibility...');
+    if (!AppState.filteredData || AppState.filteredData.length === 0) {
+        console.log('No filter applied, showing all markers and routes');
+        AppState.allMapFeatures.markers.forEach(({ elements }) => {
+            if (elements.marker) AppState.map.addLayer(elements.marker);
+            if (elements.titleOverlay) AppState.map.addLayer(elements.titleOverlay);
+        });
+        AppState.allMapFeatures.routes.forEach(({ elements }) => {
+            if (elements.polyline) AppState.map.addLayer(elements.polyline);
+            if (elements.titleOverlay) AppState.map.addLayer(elements.titleOverlay);
+        });
+        return;
+    }
+    updateMapFeatures();
+}
+
 
 // 在應用程式初始化時調用
 document.addEventListener('DOMContentLoaded', () => {

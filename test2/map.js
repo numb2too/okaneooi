@@ -15,7 +15,7 @@ function initMap() {
     AppState.map.on('click', clearHighlight);
 
     // 添加所有標記和路線
-    addMapFeatures();
+    addMapFeatures(foodData);
 
     
     // 初始化定位按鈕
@@ -104,19 +104,39 @@ function applyHighlight(elements, isHighlight) {
 
 
 // 添加地圖特徵（標記和路線）
-function addMapFeatures() {
-    foodData.forEach(item => {
+// 修改添加地圖特徵函數
+function addMapFeatures(data) {
+    // 確保清除所有現有的標記
+    clearMapFeatures();
+    
+    // 重置 allMapFeatures
+    AppState.allMapFeatures = {
+        markers: [],
+        routes: [],
+        titles: []
+    };
+
+    data.forEach(item => {
         if (item.geoJson && item.geoJson.features) {
             item.geoJson.features.forEach(feature => {
                 if (feature.geometry.type === 'Point') {
-                    addMarker(feature, item);
+                    const mapElements = addMarker(feature, item);
+                    AppState.allMapFeatures.markers.push({
+                        elements: mapElements,
+                        id: item.id
+                    });
                 } else if (feature.geometry.type === 'LineString') {
-                    addRoute(feature, item);
+                    const mapElements = addRoute(feature, item);
+                    AppState.allMapFeatures.routes.push({
+                        elements: mapElements,
+                        id: item.id
+                    });
                 }
             });
         }
     });
 }
+
 
 // 顯示簡單資訊彈窗
 function showSimpleInfoPopup(item, onThumbnailClick) {
@@ -228,6 +248,10 @@ function addMarker(feature, item) {
         'mouseover': highlightHandler,
         'mouseout': unhighlightHandler
     });
+
+
+    AppState.allMapFeatures.markers.push({ elements, id: item.id });
+    return elements;  // 返回創建的元素
 }
 
 // 更新添加路線函數
@@ -290,6 +314,10 @@ function addRoute(feature, item) {
         'mouseover': highlightHandler,
         'mouseout': unhighlightHandler
     });
+
+
+    AppState.allMapFeatures.routes.push({ elements, id: item.id });
+    return elements;  // 返回創建的元素
 }
 function showSimpleInfoPopupAt(latlng, item, onThumbnailClick) {
     const popupContent = document.createElement('div');
@@ -322,10 +350,38 @@ function resetMapView() {
 
 // 清除地圖特徵
 function clearMapFeatures() {
-    AppState.markers.forEach(marker => marker.remove());
-    AppState.routes.forEach(route => route.remove());
+    // 清除所有標記和它們的事件監聽器
+    AppState.allMapFeatures.markers.forEach(({ elements }) => {
+        if (elements.marker) {
+            elements.marker.remove();
+            elements.marker.clearAllEventListeners();
+        }
+        if (elements.titleOverlay) {
+            elements.titleOverlay.remove();
+            elements.titleOverlay.clearAllEventListeners();
+        }
+    });
+
+    // 清除所有路線和它們的事件監聽器
+    AppState.allMapFeatures.routes.forEach(({ elements }) => {
+        if (elements.polyline) {
+            elements.polyline.remove();
+            elements.polyline.clearAllEventListeners();
+        }
+        if (elements.titleOverlay) {
+            elements.titleOverlay.remove();
+            elements.titleOverlay.clearAllEventListeners();
+        }
+    });
+
+    // 重置數組
     AppState.markers = [];
     AppState.routes = [];
+    AppState.allMapFeatures = {
+        markers: [],
+        routes: [],
+        titles: []
+    };
 }
 
 // 地圖功能初始化

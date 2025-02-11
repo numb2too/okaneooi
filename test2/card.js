@@ -1,15 +1,23 @@
 // 初始化資訊卡視圖
 function initCardView() {
     const cardContainer = document.querySelector('.card-container');
-    renderCards(cardContainer);
+    renderCards(cardContainer, AppState.filteredData || foodData);
 }
 
+
 // 渲染所有資訊卡
-function renderCards(container) {
+function renderCards(container, data) {
     container.innerHTML = '';
-    foodData.forEach(item => {
+    data.forEach(item => {
         container.appendChild(createLocationCard(item));
     });
+}
+// 新增：更新資訊卡視圖的函數
+function updateCardView(filteredData) {
+    const cardContainer = document.querySelector('.card-container');
+    if (cardContainer) {
+        renderCards(cardContainer, filteredData);
+    }
 }
 
 // 創建單個位置卡片
