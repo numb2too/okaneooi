@@ -16,6 +16,10 @@ function initMap() {
 
     // 添加所有標記和路線
     addMapFeatures();
+
+    
+    // 初始化定位按鈕
+    initLocationButton();
 }
 
 // 定義統一的樣式配置
@@ -331,3 +335,154 @@ document.getElementById('resetViewBtn').addEventListener('click', () => {
     }
     document.getElementById('resetViewBtn').style.display = 'none'; // 隱藏按鈕
 });
+
+
+
+// 初始化定位按鈕
+function initLocationButton() {
+    L.Control.LocationButton = L.Control.extend({
+        options: {
+            position: 'topright'
+        },
+
+        onAdd: function (map) {
+            const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+            const button = L.DomUtil.create('a', 'location-button', container);
+            
+            button.innerHTML = '<i class="fas fa-location-arrow"></i>';
+            button.href = '#';
+            button.title = '定位當前位置';
+            
+            const buttonStyles = `
+                width: 34px;
+                height: 34px;
+                line-height: 34px;
+                text-align: center;
+                font-size: 16px;
+                background-color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 4px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                cursor: pointer;
+                text-decoration: none;
+                color: #666;
+                transition: all 0.3s ease;
+            `;
+            button.style.cssText = buttonStyles;
+
+            button.addEventListener('mouseover', () => {
+                button.style.backgroundColor = '#f4f4f4';
+            });
+            
+            button.addEventListener('mouseout', () => {
+                button.style.backgroundColor = 'white';
+            });
+
+            L.DomEvent.on(button, 'click', this._getCurrentLocation, this);
+            L.DomEvent.disableClickPropagation(container);
+
+            this._button = button;
+            this._locationMarker = null;
+            this._locationCircle = null;
+            this._pulsingDot = null;
+            return container;
+        },
+
+        _getCurrentLocation: function (e) {
+            e.preventDefault();
+            const button = this._button;
+            
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            button.style.backgroundColor = '#f0f0f0';
+
+            if (!navigator.geolocation) {
+                alert('您的瀏覽器不支援地理位置功能');
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+
+                    // 清除舊的標記
+                    if (this._locationMarker) {
+                        this._map.removeLayer(this._locationMarker);
+                    }
+                    if (this._locationCircle) {
+                        this._map.removeLayer(this._locationCircle);
+                    }
+                    if (this._pulsingDot) {
+                        this._map.removeLayer(this._pulsingDot);
+                    }
+
+                    // 添加位置精確度圓圈
+                    this._locationCircle = L.circle([lat, lng], {
+                        radius: accuracy,
+                        color: '#4A90E2',
+                        fillColor: '#4A90E2',
+                        fillOpacity: 0.15,
+                        weight: 2,
+                        opacity: 0.5
+                    }).addTo(this._map);
+
+                    // 創建自定義的定位點標記
+                    const markerHtml = `
+                        <div class="location-marker-container">
+                            <div class="location-marker-dot"></div>
+                            <div class="location-marker-pulse"></div>
+                        </div>
+                    `;
+
+                    this._locationMarker = L.marker([lat, lng], {
+                        icon: L.divIcon({
+                            className: 'location-marker',
+                            html: markerHtml,
+                            iconSize: [20, 20],
+                            iconAnchor: [10, 10]  // 將錨點設在中心
+                        })
+                    }).addTo(this._map);
+
+                    // 將地圖視角移動到當前位置
+                    this._map.setView([lat, lng], 16);
+
+                    // 恢復按鈕狀態
+                    button.innerHTML = '<i class="fas fa-location-arrow"></i>';
+                    button.style.backgroundColor = 'white';
+                },
+                (error) => {
+                    console.error('Location error:', error);
+                    let errorMessage = '無法取得位置資訊。';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage += '請確認已允許位置權限。';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage += '位置資訊暫時無法使用。';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage += '請求位置超時。';
+                            break;
+                        default:
+                            errorMessage += '發生未知錯誤。';
+                    }
+                    alert(errorMessage);
+                    
+                    button.innerHTML = '<i class="fas fa-location-arrow"></i>';
+                    button.style.backgroundColor = 'white';
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0
+                }
+            );
+        }
+    });
+
+    // 添加定位按鈕到地圖
+    new L.Control.LocationButton().addTo(AppState.map);
+}
