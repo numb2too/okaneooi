@@ -14,9 +14,8 @@ body {
 
 /* 主視圖容器 */
 #views {
-    height: calc(100vh - 120px);
-    margin-top: 150px;
-    overflow: hidden;
+    height: 100%;
+    width: 100%;
 }
 
 .view {
@@ -31,11 +30,7 @@ body {
 
 /* 底部導航 */
 .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 60px;
+    
     background: white;
     display: flex;
     justify-content: space-around;

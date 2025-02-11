@@ -1,9 +1,6 @@
 /* 搜尋區塊樣式 */
 .search-section {
-    position: fixed;
-    top: 60px;  /* 標題高度 */
-    left: 0;
-    right: 0;
+
     background: rgba(255, 255, 255, 0.9);
     padding: 10px 20px;
     z-index: 999;
@@ -23,7 +20,6 @@
     display: flex;
     align-items: center;
     padding: 0 12px;
-    margin-bottom: 8px;
 }
 
 .search-icon {

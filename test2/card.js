@@ -43,6 +43,7 @@ function createLocationCard(item) {
     // 添加標題
     const title = document.createElement('h3');
     title.textContent = item.title;
+    title.onclick = () => showLocationDetails(item);
     content.appendChild(title);
 
     // 添加標籤
