@@ -47,13 +47,29 @@ function addMapFeatures() {
             });
         }
     });
+}// 清除當前高亮
+function clearHighlight(e) {
+    if (e && e.originalEvent && e.originalEvent.target.classList.contains('marker-title')) {
+        return; // 忽略標題點擊事件
+    }
+    
+    if (AppState.currentHighlight) {
+        const { elements, styles } = AppState.currentHighlight;
+        elements.titleOverlay._icon.classList.remove('highlight');
+        if (elements.marker) {
+            elements.marker._icon.classList.remove('highlight');  // 移除 marker 的高亮
+        }
+        if (elements.polyline) {
+            elements.polyline.setStyle(styles.normal);
+        }
+    }
+    AppState.currentHighlight = null;
 }
-
 // 添加標記
 function addMarker(feature, item) {
     const [lng, lat] = feature.geometry.coordinates;
     
-    // 創建標記
+    // 使用默認 marker
     const marker = L.marker([lat, lng]).addTo(AppState.map);
     
     // 創建標題
@@ -78,34 +94,33 @@ function addMarker(feature, item) {
     };
 
     const clickHandler = (e) => {
-        e.originalEvent.stopPropagation(); // 防止觸發地圖的點擊事件
+        e.originalEvent.stopPropagation();
         clearHighlight();
         AppState.currentHighlight = { elements, styles };
         titleOverlay._icon.classList.add('highlight');
-            // 記錄當前位置
-    lastLatLng = e.latlng;
-      // 設定地圖視角，放大至 15 級（可根據需求調整）
-      AppState.map.flyTo(e.latlng, 18, { duration: 0.5 });
-        // 顯示簡單資訊
+        marker._icon.classList.add('highlight');  // 添加高亮 class
+        
+        lastLatLng = e.latlng;
+        AppState.map.flyTo(e.latlng, 18, { duration: 0.5 });
+        
         showSimpleInfoPopup(item, (clickedItem) => {
-            // 這個 callback 在縮圖點擊後執行
             showLocationDetails(clickedItem);
         });
-          // 顯示懸浮按鈕
-    document.getElementById('resetViewBtn').style.display = 'block';
+        
+        document.getElementById('resetViewBtn').style.display = 'block';
     };
-
-
     
     const highlightHandler = () => {
         if (!AppState.currentHighlight) {
             titleOverlay._icon.classList.add('highlight');
+            marker._icon.classList.add('highlight');  // hover 時也添加高亮
         }
     };
     
     const unhighlightHandler = () => {
         if (!AppState.currentHighlight) {
             titleOverlay._icon.classList.remove('highlight');
+            marker._icon.classList.remove('highlight');  // 移除高亮
         }
     };
     
@@ -121,9 +136,7 @@ function addMarker(feature, item) {
         'mouseover': highlightHandler,
         'mouseout': unhighlightHandler
     });
-
 }
-
 // 顯示簡單資訊彈窗
 function showSimpleInfoPopup(item, onThumbnailClick) {
     // 創建簡單資訊內容

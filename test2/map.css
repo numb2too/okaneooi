@@ -9,6 +9,20 @@
     background: none;
     border: none;
 }
+/* 標記圖標的基本樣式 */
+.leaflet-marker-icon {
+    transition: filter 0.2s ease;
+}
+
+/* 高亮標記圖標 */
+.leaflet-marker-icon.highlight {
+    filter: hue-rotate(45deg) brightness(1.2);
+}
+
+/* 或者如果你想要更明顯的變化，可以使用這個替代方案：*/
+.leaflet-marker-icon.highlight {
+    filter: drop-shadow(0 0 5px #1976d2);
+}
 
 /* 標記標題樣式 */
 .marker-title {
