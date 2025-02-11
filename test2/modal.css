@@ -250,3 +250,16 @@
         padding-top: 8px;
     }
 }
+
+.kml-button {
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 1.2em;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.kml-button:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}

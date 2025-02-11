@@ -1,10 +1,3 @@
-// YouTube 影片 ID 提取
-function getYouTubeVideoId(url) {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
-}
-
 // 社群媒體圖示映射
 const socialIcons = {
     youtube: '📺',
@@ -65,4 +58,56 @@ function debounce(func, wait) {
 // 將座標轉換為地圖可用格式
 function convertCoordinates(coordinates) {
     return coordinates.map(coord => [coord[1], coord[0]]);
+}
+
+// KML 生成功能
+function generateKML(item) {
+    if (!item.geoJson || !item.geoJson.features) return null;
+    
+    const feature = item.geoJson.features[0];
+    if (!feature || !feature.geometry || feature.geometry.type !== 'LineString') return null;
+
+    const coordinates = feature.geometry.coordinates;
+    const kmlCoordinates = coordinates
+        .map(coord => `${coord[0]},${coord[1]},0`)
+        .join(' ');
+
+    const kml = `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+    <Document>
+        <name>${item.title}</name>
+        <description>${item.title} 路線</description>
+        <Style id="routeStyle">
+            <LineStyle>
+                <color>ff0000ff</color>
+                <width>4</width>
+            </LineStyle>
+        </Style>
+        <Placemark>
+            <name>${item.title}</name>
+            <styleUrl>#routeStyle</styleUrl>
+            <LineString>
+                <coordinates>${kmlCoordinates}</coordinates>
+            </LineString>
+        </Placemark>
+    </Document>
+</kml>`;
+
+    return kml;
+}
+
+// 下載 KML 檔案
+function downloadKML(item) {
+    const kml = generateKML(item);
+    if (!kml) return;
+
+    const blob = new Blob([kml], { type: 'application/vnd.google-earth.kml+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${item.title}_route.kml`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }

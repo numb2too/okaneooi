@@ -131,11 +131,25 @@ function createDetailContent(item) {
             addressLink.target = '_blank';
             addressLink.className = 'google-maps-link';
             addressLink.innerHTML = `📍 ${url.addrName || '在 Google Maps 中查看'}`;
-            addressDiv.appendChild(addressLink);
+            
+        const addressDiv2 = document.createElement('div');
+        addressDiv2.appendChild(addressLink);
+            addressDiv.appendChild(addressDiv2);
         });
         
         content.appendChild(addressDiv);
     }
+
+         // 檢查是否為路線，如果是則添加 KML 下載按鈕
+         const feature = item.geoJson.features[0];
+         if (feature && feature.geometry && feature.geometry.type === 'LineString') {
+             const kmlButton = document.createElement('button');
+             kmlButton.className = 'kml-button';
+             kmlButton.innerHTML = '下載 KML 檔案';
+             kmlButton.title = '下載 KML 檔案';
+             kmlButton.onclick = () => downloadKML(item);
+             content.appendChild(kmlButton);
+         }
 
     // 添加標籤
     if (item.tags && item.tags.length > 0) {
