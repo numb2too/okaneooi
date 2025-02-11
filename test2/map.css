@@ -85,7 +85,7 @@
 
 .custom-popup .leaflet-popup-content {
     margin: 0;
-    width: 280px !important;
+    width:230px !important;
 }
 
 /* 移除彈窗尖角的陰影 */

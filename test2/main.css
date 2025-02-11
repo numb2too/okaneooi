@@ -10,18 +10,24 @@ body {
     position: relative;
     height: 100vh;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 /* 主視圖容器 */
 #views {
-    height: 100%;
-    width: 100%;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
 }
 
 .view {
     display: none;
     height: 100%;
     width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .view.active {
@@ -30,13 +36,14 @@ body {
 
 /* 底部導航 */
 .bottom-nav {
-    
+    position: relative;
     background: white;
     display: flex;
     justify-content: space-around;
     align-items: center;
     box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
     z-index: 1000;
+    padding: 8px 0;
 }
 
 .nav-btn {

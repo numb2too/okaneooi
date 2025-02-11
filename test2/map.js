@@ -2,7 +2,7 @@
 function initMap() {
     // 創建地圖實例
     AppState.map = L.map('map').setView([24.3451924, 120.6235944], 11);
-    
+
     // 添加底圖
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
@@ -17,7 +17,7 @@ function initMap() {
     // 添加所有標記和路線
     addMapFeatures(foodData);
 
-    
+
     // 初始化定位按鈕
     initLocationButton();
 }
@@ -59,20 +59,20 @@ function clearHighlight(e) {
     if (e && e.originalEvent && e.originalEvent.target.classList.contains('marker-title')) {
         return;
     }
-    
+
     if (AppState.currentHighlight) {
         const { elements } = AppState.currentHighlight;
-        
+
         // 清除標題高亮
         if (elements.titleOverlay) {
             elements.titleOverlay._icon.classList.remove('highlight');
         }
-        
+
         // 清除標記高亮
         if (elements.marker) {
             elements.marker._icon.classList.remove('highlight');
         }
-        
+
         // 清除路線高亮
         if (elements.polyline) {
             elements.polyline.setStyle(HIGHLIGHT_STYLES.normal.route);
@@ -85,17 +85,17 @@ function clearHighlight(e) {
 // 統一的高亮處理函數
 function applyHighlight(elements, isHighlight) {
     const styles = isHighlight ? HIGHLIGHT_STYLES.highlight : HIGHLIGHT_STYLES.normal;
-    
+
     // 應用標題高亮
     if (elements.titleOverlay) {
         elements.titleOverlay._icon.classList.toggle('highlight', isHighlight);
     }
-    
+
     // 應用標記高亮
     if (elements.marker) {
         elements.marker._icon.classList.toggle('highlight', isHighlight);
     }
-    
+
     // 應用路線高亮
     if (elements.polyline) {
         elements.polyline.setStyle(styles.route);
@@ -108,7 +108,7 @@ function applyHighlight(elements, isHighlight) {
 function addMapFeatures(data) {
     // 確保清除所有現有的標記
     clearMapFeatures();
-    
+
     // 重置 allMapFeatures
     AppState.allMapFeatures = {
         markers: [],
@@ -142,7 +142,7 @@ function addMapFeatures(data) {
 function showSimpleInfoPopup(item, onThumbnailClick) {
     const popupContent = document.createElement('div');
     popupContent.classList.add('simple-info-popup');
-    
+
     // 使用更結構化的 HTML
     popupContent.innerHTML = `
         <div class="popup-container">
@@ -185,9 +185,9 @@ function showSimpleInfoPopup(item, onThumbnailClick) {
 // 更新添加標記函數
 function addMarker(feature, item) {
     const [lng, lat] = feature.geometry.coordinates;
-    
-     // 建立小型標記
-     const marker = L.marker([lat, lng], {
+
+    // 建立小型標記
+    const marker = L.marker([lat, lng], {
         icon: L.divIcon({
             className: 'custom-marker',
             html: '<div class="marker-dot"></div>',
@@ -203,10 +203,10 @@ function addMarker(feature, item) {
             iconAnchor: [15, 8]
         })
     }).addTo(AppState.map);
-    
+
     AppState.markers.push(marker);
     AppState.markers.push(titleOverlay);
-    
+
     const elements = { marker, titleOverlay };
 
     const clickHandler = (e) => {
@@ -214,35 +214,35 @@ function addMarker(feature, item) {
         clearHighlight();
         AppState.currentHighlight = { elements };
         applyHighlight(elements, true);
-        
+
         lastLatLng = e.latlng;
         AppState.map.flyTo(e.latlng, 15, { duration: 0.5 });
-        
+
         showSimpleInfoPopup(item, (clickedItem) => {
             showLocationDetails(clickedItem);
         });
-        
+
         document.getElementById('resetViewBtn').style.display = 'block';
     };
-    
+
     const highlightHandler = () => {
         if (!AppState.currentHighlight) {
             applyHighlight(elements, true);
         }
     };
-    
+
     const unhighlightHandler = () => {
         if (!AppState.currentHighlight) {
             applyHighlight(elements, false);
         }
     };
-    
+
     marker.on({
         'click': clickHandler,
         'mouseover': highlightHandler,
         'mouseout': unhighlightHandler
     });
-    
+
     titleOverlay.on({
         'click': clickHandler,
         'mouseover': highlightHandler,
@@ -257,12 +257,12 @@ function addMarker(feature, item) {
 // 更新添加路線函數
 function addRoute(feature, item) {
     const coordinates = convertCoordinates(feature.geometry.coordinates);
-    
+
     const polyline = L.polyline(coordinates, HIGHLIGHT_STYLES.normal.route).addTo(AppState.map);
-    
+
     const midpointIndex = Math.floor(coordinates.length / 2);
     const midpoint = coordinates[midpointIndex];
-    
+
     const titleOverlay = L.marker(midpoint, {
         icon: L.divIcon({
             className: 'marker-title-container',
@@ -271,10 +271,10 @@ function addRoute(feature, item) {
             iconAnchor: [60, 30]
         })
     }).addTo(AppState.map);
-    
+
     AppState.routes.push(polyline);
     AppState.markers.push(titleOverlay);
-    
+
     const elements = { polyline, titleOverlay };
 
     const clickHandler = (e) => {
@@ -290,25 +290,25 @@ function addRoute(feature, item) {
         });
         document.getElementById('resetViewBtn').style.display = 'block';
     };
-    
+
     const highlightHandler = () => {
         if (!AppState.currentHighlight) {
             applyHighlight(elements, true);
         }
     };
-    
+
     const unhighlightHandler = () => {
         if (!AppState.currentHighlight) {
             applyHighlight(elements, false);
         }
     };
-    
+
     polyline.on({
         'click': clickHandler,
         'mouseover': highlightHandler,
         'mouseout': unhighlightHandler
     });
-    
+
     titleOverlay.on({
         'click': clickHandler,
         'mouseover': highlightHandler,
@@ -323,18 +323,33 @@ function showSimpleInfoPopupAt(latlng, item, onThumbnailClick) {
     const popupContent = document.createElement('div');
     popupContent.classList.add('simple-info-popup');
     popupContent.innerHTML = `
-        <img src="${item.thumbnail}" alt="${item.title}" class="info-thumbnail">
-        <div class="info-title">${item.title}</div>
-        <div class="info-address">${item.address || '地址未知'}</div>
-    `;
+    <div class="popup-container">
+        <div class="popup-image-container">
+            <img src="${item.images[0].url}" alt="${item.title}" class="info-thumbnail">
+            <div class="image-overlay">
+                <span class="click-hint">點擊查看更多</span>
+            </div>
+        </div>
+        <div class="popup-content">
+            <h3 class="info-title">${item.title}</h3>
+            <div class="info-address">
+                <i class="fas fa-map-marker-alt"></i>
+                ${item.googleUrls[0].addrName || '地址未知'}
+            </div>
+        </div>
+    </div>
+`;
 
-    // 點擊縮圖後顯示詳細資訊
-    popupContent.querySelector('.info-thumbnail').addEventListener('click', () => {
+    // 點擊整個圖片容器來顯示詳細資訊
+    popupContent.querySelector('.popup-image-container').addEventListener('click', () => {
         onThumbnailClick(item);
     });
 
     // 設定 Leaflet 彈窗，並將它放在 `latlng`
-    const popup = L.popup({ offset: [0, -16], closeButton: false })
+    const popup = L.popup({ offset: [0, -16], closeButton: false
+        ,
+        className: 'custom-popup' // 添加自訂類別以便設定樣式
+     })
         .setLatLng(latlng) // 這裡使用 `latlng`，確保點擊的地方顯示彈窗
         .setContent(popupContent)
         .openOn(AppState.map);
@@ -398,6 +413,7 @@ document.getElementById('resetViewBtn').addEventListener('click', () => {
         AppState.map.flyTo(lastLatLng, DEFAULT_ZOOM, { duration: 0.5 });
     }
     document.getElementById('resetViewBtn').style.display = 'none'; // 隱藏按鈕
+    document.querySelector('#map').click();
 });
 
 
@@ -412,11 +428,11 @@ function initLocationButton() {
         onAdd: function (map) {
             const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
             const button = L.DomUtil.create('a', 'location-button', container);
-            
+
             button.innerHTML = '<i class="fas fa-location-arrow"></i>';
             button.href = '#';
             button.title = '定位當前位置';
-            
+
             const buttonStyles = `
                 width: 34px;
                 height: 34px;
@@ -439,7 +455,7 @@ function initLocationButton() {
             button.addEventListener('mouseover', () => {
                 button.style.backgroundColor = '#f4f4f4';
             });
-            
+
             button.addEventListener('mouseout', () => {
                 button.style.backgroundColor = 'white';
             });
@@ -457,7 +473,7 @@ function initLocationButton() {
         _getCurrentLocation: function (e) {
             e.preventDefault();
             const button = this._button;
-            
+
             button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             button.style.backgroundColor = '#f0f0f0';
 
@@ -520,7 +536,7 @@ function initLocationButton() {
                 (error) => {
                     console.error('Location error:', error);
                     let errorMessage = '無法取得位置資訊。';
-                    switch(error.code) {
+                    switch (error.code) {
                         case error.PERMISSION_DENIED:
                             errorMessage += '請確認已允許位置權限。';
                             break;
@@ -534,7 +550,7 @@ function initLocationButton() {
                             errorMessage += '發生未知錯誤。';
                     }
                     alert(errorMessage);
-                    
+
                     button.innerHTML = '<i class="fas fa-location-arrow"></i>';
                     button.style.backgroundColor = 'white';
                 },

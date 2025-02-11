@@ -112,11 +112,6 @@ function createDetailContent(item) {
         content.appendChild(imagesContainer);
     }
 
-    // 添加類型圖示
-    const typeSpan = document.createElement('span');
-    typeSpan.className = 'type-icon';
-    typeSpan.textContent = locationIcons[item.type] || '📍';
-    content.appendChild(typeSpan);
 
     // 添加描述
     if (item.remember) {
@@ -199,26 +194,31 @@ function createSocialSection(socialUrls) {
         if (social.type === 'youtube' || social.type === 'shorts') {
             const videoId = getYouTubeVideoId(social.url);
             if (videoId) {
-                const thumbnail = document.createElement('div');
-                thumbnail.className = 'video-thumbnail';
-                thumbnail.onclick = () => window.open(social.url, '_blank');
-
-                thumbnail.innerHTML = `
-                    <img src="https://img.youtube.com/vi/${videoId}/maxresdefault.jpg" 
-                         onerror="this.src='https://img.youtube.com/vi/${videoId}/hqdefault.jpg'"
-                         alt="YouTube Thumbnail">
-                    <div class="play-icon">▶</div>
+                const videoCard = document.createElement('div');
+                videoCard.className = 'video-card';
+                videoCard.onclick = () => window.open(social.url, '_blank');
+        
+                videoCard.innerHTML = `
+                    <div class="thumbnail-container">
+                        <img src="https://img.youtube.com/vi/${videoId}/maxresdefault.jpg" 
+                             onerror="this.src='https://img.youtube.com/vi/${videoId}/hqdefault.jpg'"
+                             alt="YouTube ${social.type === 'shorts' ? 'Shorts' : 'Video'} Thumbnail">
+                        <div class="play-icon">▶</div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">${social.title || 'Untitled Video'}</h3>
+                        ${social.description ? `<p class="video-description">${social.description}</p>` : ''}
+                    </div>
                 `;
-                videoGrid.appendChild(thumbnail);
+                videoGrid.appendChild(videoCard);
             }
-        } else {
+        }else {
             // 處理其他社群媒體連結
             const link = document.createElement('a');
             link.href = social.url;
             link.target = '_blank';
             link.className = 'social-link';
             
-            // 根據類型設置圖標和文字
             const icon = socialIcons[social.type] || '🔗';
             const text = social.title || social.type;
             
